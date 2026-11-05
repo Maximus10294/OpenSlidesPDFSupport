@@ -1,0 +1,137 @@
+name: CI - Build and Test Service
+
+on:
+  pull_request:
+    branches:
+      - main
+      - 'feature/**'
+      - 'staging**'
+
+env:
+  NG_CLI_ANALYTICS: ci
+
+jobs:
+  build-and-test-prod-image:
+    name: build-and-test-prod-image
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone main repo
+        uses: actions/checkout@v6
+        with:
+          repository: OpenSlides/OpenSlides
+          path: "."
+          ref: main
+          submodules: "recursive"
+
+      - name: Checkout latest commits
+        env:
+          BRANCH: ${{ github.event.pull_request.head.repo.owner.login == 'OpenSlides' && contains(github.head_ref, 'feature/') && github.head_ref || github.base_ref }}
+        run: git submodule foreach 'git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*" && ((git fetch origin ${{ env.BRANCH }} && git checkout ${{ env.BRANCH }}) || (git checkout main && git pull origin main)) && git submodule update --init'
+
+      - name: Delete the client folder
+        run: rm -r openslides-client
+
+      - name: Clone openslides-client
+        uses: actions/checkout@v6
+        with:
+          path: "./openslides-client"
+
+      - name: Use example data instead of initial data
+        working-directory: "./openslides-backend/data/"
+        run: cp example-data.json initial-data.json
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          version: latest
+
+      - name: Build openslides binary
+        run: |
+          make -C openslides-cli osmanage
+          mv -f openslides-cli/osmanage dev/localprod/osmanage
+          cp -f openslides-cli/contrib/docker-compose.yml.tmpl dev/localprod/docker-compose.yml.tmpl
+
+      - name: Start setup
+        working-directory: "./dev/localprod"
+        run: |
+          ./setup.sh
+          echo -n "admin" > secrets/superadmin
+          docker compose build --parallel
+          docker compose up -d
+
+      - name: Wait for dev setup
+        uses: iFaxity/wait-on-action@v1.2.1
+        with:
+          resource: https://localhost:8000
+          timeout: 30000
+
+      - name: Start tests
+        working-directory: "./openslides-client"
+        run: make run-playwright
+
+      - name: Upload playwright logs
+        uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-report
+          path: "./openslides-client/client/tests/playwright-report/"
+          retention-days: 7
+
+      - name: Collect docker logs on failure
+        if: failure()
+        uses: jwalton/gh-docker-logs@v2
+        with:
+          dest: './logs'
+
+      - name: Upload docker logs
+        if: failure()
+        uses: actions/upload-artifact@master
+        with:
+          name: docker-logs
+          path: ./logs
+          retention-days: 7
+
+      - name: Shut down setup
+        if: always()
+        working-directory: "./dev/localprod"
+        run: docker compose down --volumes --remove-orphans
+
+  build-and-test-dev-image:
+    name: build-and-test-dev-image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: "recursive"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: client/
+
+      - name: Check linting
+        run: npm run lint
+        working-directory: client/
+
+      - name: Check prettifying
+        run: npm run prettify-check
+        working-directory: client/
+
+      - name: Check generated models are up to date
+        run: npm run generate-models && git diff --exit-code -- src/app/domain/models
+        working-directory: client/
+
+      - uses: browser-actions/setup-chrome@v2
+
+      - name: Build motion diff
+        run: npm ci && npm run build
+        working-directory: packages/openslides-motion-diff/
+
+      - name: Build and run karma tests
+        run: npm run test-silently -- --browsers=ChromiumHeadlessNoSandbox
+        working-directory: client/
