@@ -1,0 +1,9 @@
+@if (isReadyToShow) {
+    <c-chart
+        [customTooltips]="false"
+        [data]="chartData"
+        [options]="chartOptions"
+        [style.height]="calcBarChartHeight()"
+        [type]="type"
+    ></c-chart>
+}

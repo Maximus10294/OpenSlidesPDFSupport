@@ -1,0 +1,10 @@
+<div class="wait-for-action-banner">
+    <span>
+        {{ currentTitle | translate }}
+    </span>
+    <span>({{ currentWorkerName }})</span>
+    <a role="button" tabindex="0" (click)="wait()" (keyup.enter)="wait()">{{ 'Wait' | translate }}</a>
+    @if (isInactive) {
+        <a role="button" tabindex="0" (click)="stop()" (keyup.enter)="stop()">{{ 'Stop waiting' | translate }}</a>
+    }
+</div>

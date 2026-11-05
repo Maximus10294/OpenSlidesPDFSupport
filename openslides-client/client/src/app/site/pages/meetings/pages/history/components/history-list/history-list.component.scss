@@ -1,0 +1,27 @@
+.no-info {
+    font-style: italic;
+}
+
+.history-table-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.os-headed-listview-table {
+    mat-row:hover {
+        cursor: auto;
+    }
+}
+
+.os-not-found-button-content {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.history-module-form-field {
+    width: 120px;
+}
+
+.history-module-detail-form-field {
+    width: 210px;
+}

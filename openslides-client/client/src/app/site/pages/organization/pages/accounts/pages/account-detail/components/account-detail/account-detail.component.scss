@@ -1,0 +1,68 @@
+.form100 {
+    width: 100%;
+}
+
+.form50 {
+    width: 50%;
+}
+
+os-user-detail-view h2 {
+    margin-top: 0 !important;
+}
+
+.participation-table {
+    border-collapse: collapse;
+    width: 100%;
+
+    th {
+        text-align: left;
+        vertical-align: bottom;
+    }
+
+    th,
+    td {
+        padding-right: 10px;
+        min-width: 120px;
+    }
+
+    td {
+        padding-right: 5px;
+        vertical-align: top;
+        .icon {
+            display: inline-table !important;
+            vertical-align: middle;
+            $icon-size: 16px;
+            font-size: $icon-size;
+            height: $icon-size;
+            width: $icon-size;
+            color: inherit;
+        }
+    }
+
+    .admin-column {
+        text-align: right;
+        min-width: 10px;
+    }
+
+    .header-underline {
+        border-bottom: 1px solid rgba(153, 153, 153, 0.75);
+    }
+
+    .committee-underline {
+        border-bottom: 1px solid rgba(153, 153, 153, 0.5);
+    }
+
+    .word-break {
+        word-break: break-word;
+    }
+}
+
+.home-committee-area {
+    display: flex;
+    justify-content: space-between;
+    flex-flow: row wrap;
+}
+
+.external-margin-top {
+    margin-top: 16px;
+}

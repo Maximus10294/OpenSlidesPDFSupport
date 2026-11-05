@@ -1,0 +1,155 @@
+<button
+    aria-label="{{ getAriaLabel() }}"
+    class="accountButton flex-center"
+    data-cy="accountButton"
+    [matMenuTriggerFor]="userMenu"
+>
+    @if (isPresent) {
+        <div class="fake-fab-button flex-center">
+            <mat-icon class="icon-16">done</mat-icon>
+        </div>
+    } @else {
+        <div class="width-16">&nbsp;</div>
+    }
+    <div class="operator-information flex-center">
+        <div class="first-line one-line">
+            @if (isLoggedIn) {
+                {{ username }}
+            } @else {
+                {{ 'Public access' | translate }}
+            }
+        </div>
+    </div>
+    <div class="fake-fab-button flex-center">
+        <mat-icon class="icon-16">person</mat-icon>
+    </div>
+</button>
+
+<mat-menu #userMenu="matMenu" class="user-menu">
+    <ng-template matMenuContent>
+        <!-- Username -->
+        <div (mouseenter)="closeLanguageMenu()">
+            <div class="username-wrapper action-title">
+                <div>
+                    <div class="username">
+                        @if (isLoggedIn) {
+                            {{ username }}
+                        } @else {
+                            {{ 'Public access' | translate }}
+                        }
+                    </div>
+                    @if (user) {
+                        <div class="subtitle">{{ getOmlVerboseName() | translate }}</div>
+                    }
+                    <div class="subtitle structure-level">{{ getStructureLevel() }}</div>
+                </div>
+                <div>
+                    <button
+                        mat-icon-button
+                        matTooltip="{{
+                            ((isDarkModeActiveObservable | async) ? 'Light mode' : 'Dark mode') | translate
+                        }}"
+                        matTooltipPosition="left"
+                        (click)="toggleDarkMode($event)"
+                    >
+                        <mat-icon>
+                            {{ (isDarkModeActiveObservable | async) ? 'light_mode' : 'dark_mode' }}
+                        </mat-icon>
+                    </button>
+                </div>
+            </div>
+
+            @if (user && isLoggedIn) {
+                <div>
+                    <!-- present toggle -->
+                    @if (isAllowedSelfSetPresent && hasActiveMeeting) {
+                        <button
+                            aria-checked="{{ isPresent }}"
+                            mat-menu-item
+                            role="menuitemcheckbox"
+                            [ngClass]="{ active: isPresent }"
+                            (click)="toggleOperatorPresence()"
+                        >
+                            <mat-icon class="menu-icon" [color]="isPresent ? 'accent' : ''">
+                                {{ isPresent ? 'check_box' : 'check_box_outline_blank' }}
+                            </mat-icon>
+                            <span class="menu-text">{{ 'Present' | translate }}</span>
+                        </button>
+                    } @else if (hasActiveMeeting) {
+                        @if (isPresent) {
+                            <div mat-menu-item>
+                                <mat-icon class="menu-icon">done</mat-icon>
+                                <span class="menu-text">{{ 'Present' | translate }}</span>
+                            </div>
+                        } @else if (!isinMeeting) {
+                            <div mat-menu-item>
+                                <mat-icon class="menu-icon">clear</mat-icon>
+                                <span class="menu-text">{{ 'Not part of meeting' | translate }}</span>
+                            </div>
+                        } @else {
+                            <div mat-menu-item>
+                                <mat-icon class="menu-icon">clear</mat-icon>
+                                <span class="menu-text">{{ 'Not present' | translate }}</span>
+                            </div>
+                        }
+                    }
+                </div>
+            }
+        </div>
+        <mat-divider />
+
+        <!-- select language -->
+        <button #languageTrigger mat-menu-item [matMenuTriggerFor]="languageMenu">
+            <mat-icon class="menu-icon" (click)="onLangIconClick()">language</mat-icon>
+            <span class="menu-text">{{ getCurrentLanguageName() }}</span>
+        </button>
+
+        @if (user && isLoggedIn) {
+            <div>
+                <!-- Show profile -->
+                <button mat-menu-item (click)="openAccountDialog()">
+                    <mat-icon class="menu-icon">person</mat-icon>
+                    <span class="menu-text">{{ 'My account' | translate }}</span>
+                </button>
+                <!-- logout -->
+                <button data-cy="accountLogoutButton" mat-menu-item (click)="logout()">
+                    <mat-icon class="menu-icon">logout</mat-icon>
+                    <span class="menu-text">{{ 'Logout' | translate }}</span>
+                </button>
+            </div>
+        } @else if (!isLoggedIn) {
+            <div>
+                <button mat-menu-item (click)="login()">
+                    <mat-icon class="menu-icon">login</mat-icon>
+                    <span class="menu-text">{{ 'Login' | translate }}</span>
+                </button>
+            </div>
+        }
+
+        <mat-divider />
+
+        <a class="small-text" mat-menu-item routerLink="info" routerLinkActive="active">
+            <mat-icon>info</mat-icon>
+            <span>{{ 'Legal notice' | translate }}</span>
+            <span>&nbsp;&middot;&nbsp;</span>
+            <span>{{ 'Privacy policy' | translate }}</span>
+        </a>
+    </ng-template>
+</mat-menu>
+
+<mat-menu #languageMenu="matMenu">
+    <ng-template matMenuContent>
+        @for (lang of translations | keyvalue; track lang) {
+            <button mat-menu-item (click)="selectLanguage(lang.key)">
+                <mat-icon>{{ getCurrentLanguageName() === lang.value ? 'check' : '' }}</mat-icon>
+                <span>{{ lang.value }}</span>
+            </button>
+        }
+        @if (show1337 >= 0 || getCurrentLanguageName() === '1337') {
+            <button mat-menu-item (click)="selectLanguage('1337')">
+                <mat-icon>{{ getCurrentLanguageName() === '1337' ? 'check' : '' }}</mat-icon>
+                <span>1337</span>
+            </button>
+        }
+    </ng-template>
+</mat-menu>

@@ -1,0 +1,46 @@
+@use 'src/assets/styles/mixins/button.scss';
+
+.smaller-badge-text {
+    .mat-badge-content {
+        font-size: 9px;
+    }
+}
+
+.user-footer {
+    position: absolute;
+    right: 0.5em;
+    bottom: 0;
+}
+
+.prev-content {
+    padding: 0 20px;
+    margin-top: 14px;
+}
+
+.archived-label {
+    padding: 4px;
+    border: 1px solid;
+    border-radius: 4px;
+}
+
+.template-indicator {
+    display: inline-block;
+    width: 40px;
+    text-align: center;
+    .mat-icon {
+        vertical-align: middle;
+    }
+}
+
+.os-mat-card-header {
+    padding-top: 6px;
+    padding-right: 0;
+}
+
+.committee-card-menu {
+    display: flex;
+    align-items: center;
+    .mat-mdc-icon-button {
+        @include button.custom-size-button(40px, 24px);
+    }
+}

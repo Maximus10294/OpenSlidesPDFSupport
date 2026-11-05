@@ -1,0 +1,313 @@
+<!-- A summary of all changes -->
+<div class="motion-detail-diff">
+    @if (showSummary) {
+        <os-motion-detail-diff-summary
+            [changes]="changes"
+            [elContainer]="nativeElement"
+            [lastLineNr]="lastLineNr"
+            [motion]="motion"
+            [scrollToChange]="scrollToChange"
+        ></os-motion-detail-diff-summary>
+    }
+    @if (showPreamble) {
+        <span class="text-prefix-label">{{ preamble }}</span>
+    }
+
+    <!-- The actual diff view -->
+    <div class="motion-text-with-diffs underlined-links">
+        @if (getTitleChangingObject(); as changedTitle) {
+            <div>
+                <div class="diff-box diff-box-{{ changedTitle.getChangeId() }} clearfix outlined-hover outlined-border">
+                    <div *osPerms="permission.motionCanManage; and: !noEditMode" class="action-row">
+                        @if (isRecommendation(changedTitle)) {
+                            <button
+                                mat-icon-button
+                                type="button"
+                                [matMenuTriggerData]="{ change: changedTitle }"
+                                [matMenuTriggerFor]="changeRecommendationMenu"
+                            >
+                                <mat-icon>more_horiz</mat-icon>
+                            </button>
+                        }
+                    </div>
+                    @if (changedTitle.isRejected()) {
+                        <div class="status-row">
+                            <i class="grey">{{ 'Rejected' | translate }}</i>
+                        </div>
+                    }
+                    <div
+                        class="motion-text motion-text-diff"
+                        [attr.data-change-id]="changedTitle.getChangeId()"
+                        [class.line-numbers-inline]="isLineNumberingInline()"
+                        [class.line-numbers-none]="isLineNumberingNone()"
+                        [class.line-numbers-outside]="isLineNumberingOutside()"
+                    >
+                        <div class="bold">{{ 'Changed title' | translate }}:</div>
+                        <div [innerHTML]="getFormattedTitleDiff() | trust: 'html'"></div>
+                    </div>
+                </div>
+            </div>
+        }
+        @for (change of workingTextChangingObjects; track change.getChangeId(); let i = $index) {
+            <div>
+                <div
+                    class="motion-text"
+                    [class.line-numbers-inline]="isLineNumberingInline()"
+                    [class.line-numbers-none]="isLineNumberingNone()"
+                    [class.line-numbers-outside]="isLineNumberingOutside()"
+                >
+                    <os-motion-detail-original-change-recommendations
+                        [changeRecommendations]="[]"
+                        [html]="getTextBetweenChanges(workingTextChangingObjects[i - 1], change)"
+                        [motionId]="motion.id"
+                        (createChangeRecommendation)="onCreateChangeRecommendation($event)"
+                    ></os-motion-detail-original-change-recommendations>
+                </div>
+                <div
+                    class="diff-box diff-box-{{ change.getChangeId() }} clearfix outlined-hover outlined-border"
+                    [class.collides]="hasCollissions(change, workingTextChangingObjects)"
+                >
+                    <div class="action-row">
+                        <button
+                            *osPerms="permission.motionCanManage; and: isRecommendation(change) && !noEditMode"
+                            mat-icon-button
+                            type="button"
+                            [matMenuTriggerData]="{ change: change }"
+                            [matMenuTriggerFor]="changeRecommendationMenu"
+                        >
+                            <mat-icon>more_horiz</mat-icon>
+                        </button>
+                        @if (isAmendment(change) && !noEditMode) {
+                            <button
+                                mat-icon-button
+                                type="button"
+                                [matMenuTriggerData]="{ change: change }"
+                                [matMenuTriggerFor]="amendmentMenu"
+                            >
+                                <mat-icon>more_horiz</mat-icon>
+                            </button>
+                        }
+                    </div>
+                    <div class="status-row">
+                        <div class="collission-hint">
+                            @if (hasCollissions(change, workingTextChangingObjects)) {
+                                <mat-icon matTooltip="{{ 'This change collides with another one.' | translate }}">
+                                    warning
+                                </mat-icon>
+                            }
+                        </div>
+
+                        @if (isChangeRecommendation(change) && change.isRejected()) {
+                            <div class="status-content">
+                                <i class="grey">{{ 'Rejected' | translate }}</i>
+                            </div>
+                        }
+                        <!-- If it's an amendment, only accepted ones will be passed to this component
+            by default (== !showAllAmendments). In this case, don't show the prefix.
+            However, if showAllAmendments === true, the prefix should be shown alwayes,
+            even if it's accepted -->
+                        @if (isAmendment(change) && showAllAmendments) {
+                            <div class="status-content">
+                                <i class="grey">{{ change.amendment.number }}</i>
+                                @if (
+                                    change.amendment.isForwardedAmendment && originName(change.amendment) !== undefined
+                                ) {
+                                    <mat-icon
+                                        class="pointer-icon"
+                                        color="primary"
+                                        inline
+                                        [matTooltip]="originName(change.amendment)"
+                                        [matTooltipPosition]="position.value!"
+                                    >
+                                        info
+                                    </mat-icon>
+                                }
+                                <i class="grey">&nbsp;- {{ change.amendment.state!.name }}</i>
+                                <i class="grey">
+                                    &nbsp;- {{ getSubmitterListWithDeletedUsers(change.amendment.submitterNames) }}
+                                </i>
+                            </div>
+                        }
+                    </div>
+
+                    @if (isAmendment(change) && showAllAmendments && originMotionDisplay) {
+                        @for (origin of change.amendment.all_origins; track origin.id) {
+                            @if (originMotionsLoaded.includes(origin.lead_motion_id)) {
+                                <div class="amendment-origin">
+                                    {{ origin.meeting.name }}:
+                                    {{ origin.state }}
+                                </div>
+                            }
+                        }
+                    }
+                    <div
+                        class="motion-text motion-text-diff"
+                        [attr.data-change-id]="change.getChangeId()"
+                        [class.line-numbers-inline]="isLineNumberingInline()"
+                        [class.line-numbers-none]="isLineNumberingNone()"
+                        [class.line-numbers-outside]="isLineNumberingOutside()"
+                        [innerHTML]="getDiff(change) | trust: 'html'"
+                    ></div>
+                    @if (
+                        isAmendment(change) && showAllAmendments && change.amendment.change_recommendation_ids?.length
+                    ) {
+                        <div class="amendment-cr-hint">
+                            <mat-icon matTooltip="{{ 'This amendment has change recommendations.' | translate }}">
+                                info
+                            </mat-icon>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <div
+            class="motion-text"
+            [class.line-numbers-inline]="isLineNumberingInline()"
+            [class.line-numbers-none]="isLineNumberingNone()"
+            [class.line-numbers-outside]="isLineNumberingOutside()"
+        >
+            <os-motion-detail-original-change-recommendations
+                [changeRecommendations]="[]"
+                [html]="getTextRemainderAfterLastChange()"
+                [motionId]="motion.id"
+                (createChangeRecommendation)="onCreateChangeRecommendation($event)"
+            ></os-motion-detail-original-change-recommendations>
+        </div>
+    </div>
+    @if (brokenTextChangingObjects.length > 0) {
+        <div class="broken-motion-text">
+            <div>
+                <div class="broken-box broken-box-title">
+                    <div class="motion-text motion-text-diff">
+                        <span>
+                            {{ 'Inconsistent data.' | translate }}
+                        </span>
+                        <span>
+                            {{ this.brokenTextChangingObjects.length }}
+                        </span>
+                        <span>
+                            {{ 'change recommendation(s) refer to a nonexistent line number.' | translate }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            @for (change of brokenTextChangingObjects; track change.getChangeId(); let i = $index) {
+                <div>
+                    <div class="broken-box diff-box-{{ change.getChangeId() }} clearfix outlined-hover outlined-border">
+                        <div class="broken-action-row">
+                            <button
+                                *osPerms="permission.motionCanManage; and: isRecommendation(change) && !noEditMode"
+                                mat-icon-button
+                                type="button"
+                                [matMenuTriggerData]="{ change: change }"
+                                [matMenuTriggerFor]="brokenChangeRecommendation"
+                            >
+                                <mat-icon>more_horiz</mat-icon>
+                            </button>
+                        </div>
+                        <div class="broken-motion-text">
+                            <div>
+                                {{ 'Inconsistent data. Please delete this change recommendation.' | translate }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <mat-menu #amendmentMenu="matMenu">
+        <ng-template let-change="change" matMenuContent>
+            <a
+                mat-menu-item
+                type="button"
+                [routerLink]="change.amendment.getDetailStateUrl()"
+                [state]="{ back: 'true' }"
+            >
+                <mat-icon>visibility_on</mat-icon>
+                @if (!change?.amendment?.identifier) {
+                    <span>{{ 'Show amendment' | translate }}</span>
+                }
+                @if (change?.amendment?.identifier) {
+                    <span>{{ change.amendment.identifier }}</span>
+                }
+            </a>
+
+            <!-- perms.isAllowed('change_state', motion) (which does not exist)-->
+            <ng-container *osPerms="permission.motionCanManage">
+                @if (change.amendment.state.next_states.length > 0) {
+                    <mat-divider></mat-divider>
+                }
+                @for (state of change.amendment.state.next_states; track state.id) {
+                    <button mat-menu-item (click)="setAmendmentState(change, state.id)">
+                        {{ state.name }}
+                        @if (state.show_state_extension_field) {
+                            <span>&nbsp;...</span>
+                        }
+                    </button>
+                }
+                @if (change.amendment.state.next_states.length > 0) {
+                    <mat-divider></mat-divider>
+                }
+                @for (state of change.amendment.state.previous_states; track state.id) {
+                    <button mat-menu-item (click)="setAmendmentState(change, state.id)">
+                        <mat-icon>arrow_back</mat-icon>
+                        {{ state.name }}
+                        @if (state.show_state_extension_field) {
+                            <span>&nbsp;...</span>
+                        }
+                    </button>
+                }
+                <button mat-menu-item (click)="resetAmendmentState(change)">
+                    <mat-icon>replay</mat-icon>
+                    {{ 'Reset state' | translate }}
+                </button>
+            </ng-container>
+        </ng-template>
+    </mat-menu>
+
+    <mat-menu #changeRecommendationMenu="matMenu">
+        <ng-template let-change="change" matMenuContent>
+            <button mat-menu-item type="button" (click)="setAcceptanceValue(change, 'accepted')">
+                <mat-icon>thumb_up</mat-icon>
+                <span>{{ 'Accept' | translate }}</span>
+                <mat-icon class="active-indicator">{{ change.isAccepted() ? 'done' : '' }}</mat-icon>
+            </button>
+            <button mat-menu-item type="button" (click)="setAcceptanceValue(change, 'rejected')">
+                <mat-icon>thumb_down</mat-icon>
+                <span>{{ 'Reject' | translate }}</span>
+                <mat-icon class="active-indicator">{{ change.isRejected() ? 'done' : '' }}</mat-icon>
+            </button>
+            <button mat-menu-item type="button" (click)="setInternal(change, !change.internal)">
+                <mat-icon>{{ change.internal ? 'check_box_outline_blank' : 'check_box' }}</mat-icon>
+                <span>{{ 'Public' | translate }}</span>
+            </button>
+            <button mat-menu-item type="button" (click)="deleteChangeRecommendation(change, $event)">
+                <mat-icon>delete</mat-icon>
+                <span>{{ 'Delete' | translate }}</span>
+            </button>
+            @if (!change.isTitleChange()) {
+                <button mat-menu-item type="button" (click)="editChangeRecommendation(change, $event)">
+                    <mat-icon>edit</mat-icon>
+                    <span>{{ 'Edit' | translate }}</span>
+                </button>
+            }
+            @if (change.isTitleChange()) {
+                <button mat-menu-item type="button" (click)="editTitleChangeRecommendation(change, $event)">
+                    <mat-icon>edit</mat-icon>
+                    <span>{{ 'Edit' | translate }}</span>
+                </button>
+            }
+        </ng-template>
+    </mat-menu>
+
+    <mat-menu #brokenChangeRecommendation="matMenu">
+        <ng-template let-change="change" matMenuContent>
+            <button mat-menu-item type="button" (click)="deleteChangeRecommendation(change, $event)">
+                <mat-icon>delete</mat-icon>
+                <span>{{ 'Delete' | translate }}</span>
+            </button>
+        </ng-template>
+    </mat-menu>
+</div>

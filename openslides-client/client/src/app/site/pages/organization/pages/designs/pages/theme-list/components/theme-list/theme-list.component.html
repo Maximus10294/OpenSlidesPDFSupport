@@ -1,0 +1,76 @@
+<os-head-bar
+    [hasMainButton]="true"
+    [mainActionTooltip]="'New design' | translate"
+    (mainEvent)="openThemeBuilderDialog()"
+>
+    <!-- Title -->
+    <div class="title-slot">
+        <h1 class="mock-h2" translate>Design</h1>
+    </div>
+</os-head-bar>
+
+<os-list
+    listStorageKey="themes"
+    [alwaysShowMenu]="true"
+    [filterProps]="['name']"
+    [listObservable]="repo.getViewModelListObservable()"
+    [multiSelect]="isMultiSelect"
+    [vScrollFixed]="60"
+    [(selectedRows)]="selectedRows"
+>
+    <div
+        *osScrollingTableCell="'name'; row as theme"
+        class="cell-slot fill pointer"
+        role="button"
+        tabindex="0"
+        (click)="openThemeBuilderDialog(theme)"
+        (keyup.space)="openThemeBuilderDialog(theme)"
+    >
+        <div class="ellipsis-overflow">
+            {{ theme.name }}
+        </div>
+    </div>
+    <div
+        *osScrollingTableCell="'colors'; row as theme; config: { width: 120 }"
+        aria-hidden="true"
+        class="cell-slot fill pointer"
+        (click)="openThemeBuilderDialog(theme)"
+    >
+        <div class="button-group" [matTooltip]="'Modify design' | translate">
+            <div class="fake-button-no-touch" [ngStyle]="{ background: theme.primary_500 }"></div>
+            <div class="fake-button-no-touch" [ngStyle]="{ background: theme.accent_500 }"></div>
+            <div class="fake-button-no-touch" [ngStyle]="{ background: theme.warn_500 }"></div>
+        </div>
+    </div>
+    <div *osScrollingTableCell="'is_active'; row as theme; config: { width: 30 }" class="cell-slot fill central-button">
+        <os-prompt-checkbox
+            [checked]="isThemeUsed(theme)"
+            [content]="
+                'Are you sure you want to activate this color set? This will change the colors in all meetings.'
+                    | translate
+            "
+            [disabled]="isThemeUsed(theme)"
+            [matTooltip]="'Activate design' | translate"
+            [title]="'Change color set' | translate"
+            (selected)="changeCurrentTheme($event, theme)"
+        ></os-prompt-checkbox>
+    </div>
+    <div *osScrollingTableCell="'menu'; row as theme; config: { width: 40 }" class="cell-slot fill">
+        <button mat-icon-button [matMenuTriggerData]="{ theme: theme }" [matMenuTriggerFor]="themeMenu">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+    </div>
+</os-list>
+
+<mat-menu #themeMenu="matMenu">
+    <ng-template let-theme="theme" matMenuContent>
+        <button mat-menu-item (click)="openThemeBuilderDialog(theme)">
+            <mat-icon>edit</mat-icon>
+            <span>{{ 'Edit' | translate }}</span>
+        </button>
+        <button class="red-warning-text" mat-menu-item (click)="deleteTheme(theme)">
+            <mat-icon>delete</mat-icon>
+            <span>{{ 'Delete' | translate }}</span>
+        </button>
+    </ng-template>
+</mat-menu>

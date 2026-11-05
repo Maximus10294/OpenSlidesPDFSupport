@@ -1,0 +1,58 @@
+@use 'src/assets/styles/variables.scss';
+
+.structure-level-list {
+    $auto-sizing: auto-fill;
+    $column-min-width: 186px;
+
+    padding: 8px 0 0 0;
+    display: grid;
+    column-gap: 16px;
+    grid-template-columns: repeat($auto-sizing, minmax($column-min-width, max-content));
+
+    @media (max-width: 1383px) {
+        $auto-sizing: auto-fit;
+    }
+
+    @include variables.phone {
+        $column-min-width: 159px;
+        padding: 0;
+        margin-right: -20px;
+        column-gap: 5px;
+    }
+
+    .structure-level {
+        margin-bottom: 16px;
+        display: flex;
+        flex-direction: row;
+        justify-content: end;
+        width: min(222px, 100%);
+
+        @include variables.phone {
+            width: min(186px, 100%);
+        }
+
+        .structure-level-content {
+            .structure-level-color {
+                height: 3px;
+                background-color: transparent;
+                margin-right: 0;
+                width: 111px;
+                border-width: 0;
+                border-radius: 7px;
+            }
+
+            .structure-level-time {
+                font-size: 35px;
+                display: flex;
+                justify-content: end;
+                line-height: 0.95;
+            }
+
+            .structure-level-name {
+                line-height: 1;
+                text-align: right;
+                word-break: break-word;
+            }
+        }
+    }
+}

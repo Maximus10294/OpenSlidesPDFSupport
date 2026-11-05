@@ -1,0 +1,191 @@
+<os-head-bar
+    [hasMainButton]="canEdit"
+    [mainActionTooltip]="'New file' | translate"
+    [multiSelectMode]="isMultiSelect"
+    (mainEvent)="onMainEvent()"
+>
+    <!-- Title -->
+    <div class="title-slot">
+        <h1 class="mock-h2" translate>Files</h1>
+    </div>
+
+    <!-- Menu -->
+    <ng-container class="menu-slot">
+        <button
+            *osOmlPerms="OML.can_manage_organization; and: !isMultiSelect"
+            mat-icon-button
+            type="button"
+            [matTooltip]="'New folder' | translate"
+            [matTooltipShowDelay]="500"
+            (click)="createNewFolder(newFolderDialog)"
+        >
+            <mat-icon>create_new_folder</mat-icon>
+        </button>
+        <button mat-icon-button type="button" [matMenuTriggerFor]="mediafilesMenu">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+    </ng-container>
+
+    <!-- Multiselect info -->
+    <ng-container class="central-info-slot">
+        <button mat-icon-button (click)="toggleMultiSelect()"><mat-icon>arrow_back</mat-icon></button>
+        <span>{{ selectedRows.length }}&nbsp;{{ 'selected' | translate }}</span>
+    </ng-container>
+</os-head-bar>
+
+<!-- the actual file manager -->
+<os-file-list
+    [canAccessFileMenu]="canAccessFileMenu"
+    [canEdit]="canEdit"
+    [currentDirectory]="directory"
+    [editFolderTemplate]="fileEditDialog"
+    [fileMenuTemplate]="fileMenuTemplate"
+    [isInMeeting]="false"
+    [isMultiSelect]="isMultiSelect"
+    [isOrgaLevelAndRootLevel]="isOrgaLevelAndRootLevel"
+    [isUsedAsFontFn]="isUsedAsFontFn"
+    [isUsedAsLogoFn]="isUsedAsLogoFn"
+    [shouldShowFileMenuFn]="shouldShowFileMenuFn"
+    [sourceFiles]="directoryObservable"
+    (beforeEditing)="onEditFile($event.file)"
+    (deleted)="onDeleteFile($event.file)"
+    (directoryChanged)="changeDirectory($event.directoryId)"
+    (saved)="onSaveFile($event.update)"
+    (selected)="onSelect($event.files)"
+/>
+
+<!-- Menu for Mediafiles -->
+<mat-menu #mediafilesMenu="matMenu">
+    @if (!isMultiSelect) {
+        <div>
+            <button mat-menu-item (click)="toggleMultiSelect()">
+                <mat-icon>library_add</mat-icon>
+                <span>{{ 'Multiselect' | translate }}</span>
+            </button>
+            <button mat-menu-item (click)="downloadMultiple()">
+                <mat-icon>cloud_download</mat-icon>
+                <span>{{ 'Download folder' | translate }}</span>
+            </button>
+        </div>
+    }
+    @if (isMultiSelect) {
+        <div>
+            <button mat-menu-item (click)="selectAll()">
+                <mat-icon>done_all</mat-icon>
+                <span>{{ 'Select all' | translate }}</span>
+            </button>
+            <button mat-menu-item [disabled]="!selectedRows.length" (click)="deselectAll()">
+                <mat-icon>clear</mat-icon>
+                <span>{{ 'Deselect all' | translate }}</span>
+            </button>
+            <mat-divider *osOmlPerms="OML.can_manage_organization"></mat-divider>
+            <button mat-menu-item [disabled]="!selectedRows.length" (click)="downloadMultiple(selectedRows)">
+                <mat-icon>cloud_download</mat-icon>
+                <span>{{ 'Download' | translate }}</span>
+            </button>
+            <button
+                *osOmlPerms="OML.can_manage_organization"
+                mat-menu-item
+                [disabled]="!selectedRows.length"
+                (click)="onMove(selectedRows)"
+            >
+                <mat-icon>near_me</mat-icon>
+                <span>{{ 'Move' | translate }}</span>
+            </button>
+            <mat-divider></mat-divider>
+            <button
+                *osOmlPerms="OML.can_manage_organization"
+                mat-menu-item
+                [disabled]="!selectedRows.length"
+                (click)="deleteSelected()"
+            >
+                <mat-icon color="warn">delete</mat-icon>
+                <span>{{ 'Delete' | translate }}</span>
+            </button>
+        </div>
+    }
+</mat-menu>
+
+<!-- File edit dialog -->
+<ng-template #fileEditDialog>
+    <h1 mat-dialog-title>{{ 'Edit details for' | translate }}</h1>
+    <mat-dialog-content class="os-form-card-mobile">
+        <form class="edit-file-form" [formGroup]="fileEditForm!">
+            <mat-form-field>
+                <mat-label>{{ 'New file name' | translate }}</mat-label>
+                <input formControlName="title" matInput osAutofocus required type="text" />
+                @if (fileEditForm?.invalid) {
+                    <mat-error>{{ 'Required' | translate }}</mat-error>
+                }
+            </mat-form-field>
+        </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button
+            color="accent"
+            mat-button
+            type="submit"
+            [disabled]="!fileEditForm?.valid"
+            [mat-dialog-close]="fileEditForm?.value"
+        >
+            <span>{{ 'Save' | translate }}</span>
+        </button>
+        <button mat-button type="button" [mat-dialog-close]="null">
+            <span>{{ 'Cancel' | translate }}</span>
+        </button>
+    </mat-dialog-actions>
+</ng-template>
+
+<!-- Template for the managing buttons -->
+<ng-template #manageButton let-mediafile="mediafile" let-place="place">
+    <button
+        mat-menu-item
+        [disabled]="updatingLogoAndFontSettings"
+        (click)="toggleMediafileUsage($event, mediafile, place)"
+    >
+        <mat-icon color="accent">
+            {{ isMediafileUsed(mediafile, place) ? 'check_box' : 'check_box_outline_blank' }}
+        </mat-icon>
+        <span>{{ getDisplayNameForPlace(place) | translate }}</span>
+    </button>
+</ng-template>
+
+<ng-template #fileMenuTemplate let-mediafile="mediafile">
+    <div *osOmlPerms="OML.can_manage_organization">
+        <!-- Exclusive for images -->
+        @if (mediafile.isImage()) {
+            <div>
+                @for (place of logoPlaces; track place) {
+                    <ng-container
+                        *ngTemplateOutlet="manageButton; context: { mediafile: mediafile, place: place }"
+                    ></ng-container>
+                }
+            </div>
+        }
+        @if (mediafile.isImage()) {
+            <mat-divider></mat-divider>
+        }
+    </div>
+</ng-template>
+
+<!-- New folder dialog -->
+<ng-template #newFolderDialog>
+    <h1 mat-dialog-title>{{ 'New directory' | translate }}</h1>
+    <mat-dialog-content class="os-form-card-mobile">
+        <form class="edit-file-form" [formGroup]="newDirectoryForm">
+            <p>{{ 'Please enter a name for the new directory:' | translate }}</p>
+            <mat-form-field>
+                <mat-label>{{ 'Title' | translate }}</mat-label>
+                <input formControlName="title" matInput osAutofocus required />
+            </mat-form-field>
+        </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button color="accent" mat-button type="submit" [disabled]="!newDirectoryForm.valid" [mat-dialog-close]="true">
+            <span>{{ 'Save' | translate }}</span>
+        </button>
+        <button mat-button type="button" [mat-dialog-close]="null">
+            <span>{{ 'Cancel' | translate }}</span>
+        </button>
+    </mat-dialog-actions>
+</ng-template>

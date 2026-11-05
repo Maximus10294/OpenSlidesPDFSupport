@@ -1,0 +1,136 @@
+<os-head-bar [editMode]="hasChanged" [nav]="false" (mainEvent)="onCancel()" (saveEvent)="onSave()">
+    <!-- Title -->
+    <div class="title-slot">
+        <h1 class="mock-h2" translate>Call list</h1>
+    </div>
+
+    <!-- Export menu -->
+    <ng-container class="menu-slot">
+        <button mat-icon-button type="button" [matMenuTriggerFor]="mainMenu">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+    </ng-container>
+</os-head-bar>
+
+<div class="custom-table-header flex-spaced">
+    <div class="filter-count">
+        <span>{{ seenNodes[0] }}&nbsp;</span>
+        <span>{{ 'of' | translate }}</span>
+        <span>&nbsp;{{ seenNodes[1] }}</span>
+    </div>
+    @if (hasActiveFilter) {
+        <div class="current-filters">
+            <div>
+                <button mat-button (click)="resetFilters()">
+                    <mat-icon>close</mat-icon>
+                    <span>{{ 'Clear all filters' | translate }}</span>
+                </button>
+            </div>
+        </div>
+    }
+    <div class="flex-spaced margin-right-5">
+        @if (categoryFilterOptions.length) {
+            <div>
+                <button mat-button [matMenuTriggerFor]="catFilterMenu">
+                    <span
+                        class="upper badge-space"
+                        matBadgeColor="accent"
+                        [matBadge]="activeCatFilterCount > 0 ? activeCatFilterCount : null"
+                        [matBadgeOverlap]="false"
+                    >
+                        {{ 'Categories' | translate }}
+                    </span>
+                </button>
+            </div>
+        }
+        @if (tagFilterOptions.length) {
+            <div>
+                <button mat-button [matMenuTriggerFor]="tagFilterMenu">
+                    <span
+                        class="upper badge-space"
+                        matBadgeColor="accent"
+                        [matBadge]="activeTagFilterCount > 0 ? activeTagFilterCount : null"
+                        [matBadgeOverlap]="false"
+                    >
+                        {{ 'Tags' | translate }}
+                    </span>
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+<mat-menu #catFilterMenu="matMenu">
+    @for (catOption of categoryFilterOptions; track catOption) {
+        <div>
+            <button mat-menu-item (click)="onFilterChange('category', catOption.id)">
+                @if (catOption.state) {
+                    <mat-icon>checked</mat-icon>
+                }
+                <span>{{ catOption.label }}</span>
+            </button>
+        </div>
+    }
+</mat-menu>
+<mat-menu #tagFilterMenu="matMenu">
+    @for (tagOption of tagFilterOptions; track tagOption) {
+        <div>
+            <button mat-menu-item (click)="onFilterChange('tag', tagOption.id)">
+                @if (tagOption.state) {
+                    <mat-icon>checked</mat-icon>
+                }
+                <span>{{ tagOption.label }}</span>
+            </button>
+        </div>
+    }
+</mat-menu>
+
+<mat-card class="spacer-bottom-60">
+    <mat-card-content>
+        <os-sorting-tree
+            #osSortedTree
+            parentKey="sort_parent_id"
+            weightKey="sort_weight"
+            [filterChange]="changeFilter"
+            [model]="motionsObservable"
+            [sortingDefinition]="forceSort"
+            (hasChanged)="receiveChanges($event)"
+            (visibleNodes)="onChangeAmountOfItems($event)"
+        >
+            <ng-template #innerNode let-item="item">
+                <div class="line">
+                    <div class="left">
+                        {{ item.getTitle() }}
+                    </div>
+                    <div class="right">
+                        @for (tag of getTags(item); track tag) {
+                            <span class="tag">
+                                <mat-icon inline>local_offer</mat-icon>
+                                {{ tag.getTitle() }}
+                            </span>
+                        }
+                    </div>
+                </div>
+            </ng-template>
+        </os-sorting-tree>
+    </mat-card-content>
+</mat-card>
+
+<mat-menu #mainMenu="matMenu">
+    <button mat-menu-item (click)="sortMotionsByNumber()">
+        <mat-icon>sort</mat-icon>
+        <span>{{ 'Sort by identifier' | translate }}</span>
+    </button>
+
+    <mat-divider />
+
+    <button mat-menu-item (click)="pdfExportCallList()">
+        <mat-icon>picture_as_pdf</mat-icon>
+        <span>{{ 'Export as PDF' | translate }}</span>
+    </button>
+
+    <button mat-menu-item (click)="csvExportCallList()">
+        <mat-icon>archive</mat-icon>
+        <span>{{ 'Export as CSV' | translate }}</span>
+    </button>
+</mat-menu>

@@ -1,0 +1,43 @@
+.expandable-content-wrapper {
+    word-wrap: break-word;
+
+    .content {
+        &.collapsed {
+            max-height: 76px;
+            overflow: hidden;
+            position: relative;
+            &::after {
+                content: '';
+                position: absolute;
+                top: 25px;
+                bottom: 0;
+                left: 0;
+                right: 0;
+            }
+        }
+    }
+
+    .content {
+        &.collapsed-delegations {
+            max-height: 255px;
+        }
+    }
+
+    .show-entire-text {
+        margin-top: 4px;
+        a {
+            cursor: pointer;
+        }
+    }
+
+    .margin-top-8 {
+        margin-top: 10px !important;
+    }
+
+    .show-entire-text {
+        a:focus {
+            outline: none;
+            text-decoration: underline;
+        }
+    }
+}

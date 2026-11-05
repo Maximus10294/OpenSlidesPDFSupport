@@ -1,0 +1,35 @@
+<mat-drawer-container class="list-view-frame">
+    <div class="list-view-table-wrapper">
+        @if (showFilterBar) {
+            <os-sort-filter-bar
+                class="sort-filter-bar"
+                [fakeFilters]="fakeFilters"
+                [filterCount]="currentCountObservable | async"
+                [filterService]="filterService!"
+                [searchFieldInput]="searchFieldInput"
+                [searchService]="searchService!"
+                [showSpacer]="addBottomSpacer"
+                [sortService]="sortService!"
+                [totalCount]="totalCountObservable | async"
+                (searchFieldChanged)="searchFilterUpdated.emit($event)"
+            >
+                <div class="extra-info-slot">
+                    <ng-content select=".filter-bar-info-slot"></ng-content>
+                </div>
+            </os-sort-filter-bar>
+        }
+
+        <os-scrolling-table
+            [addBottomSpacer]="addBottomSpacer"
+            [dataSource]="dataListObservable"
+            [fullDataSource]="dataFullListObservable"
+            [hiddenColumns]="hiddenColumns"
+            [rowHeight]="vScrollFixed"
+            [selectionMode]="multiSelect"
+            [tableHeight]="fullScreen ? undefined : '50vh'"
+            (selectionChanged)="selectedRowsChange.emit($event.selectedRows)"
+        >
+            <div *osScrollingTableNoData class="no-data-placeholder subtitle">{{ 'No data' | translate }}</div>
+        </os-scrolling-table>
+    </div>
+</mat-drawer-container>

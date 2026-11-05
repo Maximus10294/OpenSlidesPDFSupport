@@ -1,0 +1,418 @@
+/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+/** angular material theming */
+@use 'sass:meta';
+@use 'assets/styles/theme-styles.scss';
+@use 'assets/styles/reason.scss';
+
+/** Useful default classes */
+@use 'assets/styles/default-classes.scss';
+
+/** fonts */
+@use 'assets/styles/fonts.scss';
+@import 'material-design-icons-iconfont/dist/material-design-icons.css';
+
+/** Load global scss variables and device mixing */
+@include meta.load-css('assets/styles/variables.scss');
+
+@include meta.load-css('assets/styles/tables.scss');
+
+:root {
+    --global-headbar-height: 28px;
+    --view-headbar-height: 50px;
+}
+
+@include meta.load-css('assets/styles/utils.scss');
+
+@include meta.load-css('assets/styles/reset.scss');
+@include meta.load-css('assets/styles/typography.scss');
+@include meta.load-css('assets/styles/colors.scss');
+@include meta.load-css('assets/styles/components.scss');
+@include meta.load-css('assets/styles/material/icon.scss');
+@include meta.load-css('assets/styles/pbl.scss');
+@include meta.load-css('assets/styles/tiptap.scss');
+
+/**
+* Must be cleaned up
+*/
+/** Define the general style-rules */
+.mat-toolbar h2,
+.mat-mdc-dialog-title {
+    font-family:
+        OSFont,
+        Fira Sans,
+        Roboto,
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+.generic-mini-button {
+    bottom: -28px;
+    z-index: 100;
+}
+
+.no-content {
+    text-align: center;
+    color: gray;
+}
+
+.mat-mdc-card {
+    @extend .regular-shadow;
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+.projector-card .mat-form-field-infix {
+    width: 290px;
+}
+
+//custom table header for search button, filtering and more. Used in ListViews
+.custom-table-header {
+    $height: 40px;
+    width: 100%;
+    height: $height;
+    line-height: $height;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    display: flex;
+
+    button {
+        border-radius: 0%;
+    }
+
+    input {
+        position: relative;
+        max-width: 400px;
+        z-index: 2;
+        padding-right: 5px;
+        margin-right: 0px;
+    }
+
+    .mat-icon {
+        vertical-align: text-bottom;
+        margin-right: 2px;
+    }
+}
+
+/* hide scrollbars caused by hidden filter dialog outside of the viewport */
+.mat-drawer-content {
+    overflow-x: hidden !important;
+}
+
+.card-plus-distance {
+    margin-top: 40px;
+}
+
+/**title of an app page*/
+.app-name {
+    margin-left: 20px;
+}
+
+/**content of an app page*/
+.app-content {
+    margin: 20px;
+    margin-top: 50px;
+}
+
+.mat-expansion-panel {
+    border-radius: 0 !important;
+}
+
+.mat-mdc-menu-panel {
+    max-width: initial !important;
+}
+
+.hidden-cell {
+    flex: 0;
+    width: 0;
+    display: none;
+}
+
+.file-drop-zone-style {
+    border: 2px dotted #0782d0 !important;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+}
+
+.file-drop-content-style {
+    height: 100px;
+    align-content: center;
+
+    .ngx-file-drop__drop-zone-label {
+        color: #0782d0;
+        line-height: 24px;
+    }
+}
+
+.mat-mdc-chip,
+.mat-mdc-basic-chip {
+    font-size: 12px;
+    min-height: 22px !important;
+    border-radius: 5px !important;
+    padding: 0px 8px !important;
+    margin: 0;
+    line-height: 2;
+    display: inline-flex;
+    &.pre-wrap {
+        .mdc-evolution-chip__text-label {
+            -webkit-user-select: none;
+            user-select: none;
+            white-space: pre-wrap !important;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+    }
+}
+
+.export-wrapper {
+    .mat-mdc-chip,
+    .mat-mdc-basic-chip, 
+    .mdc-evolution-chip__text-label,
+    .mat-mdc-chip-action-label {
+        padding: 0px 0px !important;
+        min-height: var(--mat-chip-container-height) !important;
+        align-content: center;
+    }
+}
+
+.mat-mdc-chip:focus,
+.mat-mdc-basic-chip:focus {
+    outline: none;
+}
+button.mat-mdc-menu-item.selected {
+    font-weight: bold !important;
+}
+
+.mat-mdc-menu-item .mat-icon {
+    margin-right: 8px !important;
+}
+
+.mat-mdc-mini-fab.large {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+
+    .mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+        line-height: 24px;
+    }
+}
+
+.title {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.content-container {
+    margin: 0 25px;
+
+    h1 {
+        font-size: 30px;
+    }
+
+    @media (max-width: 960px) {
+        margin: 0 15px;
+    }
+}
+
+/** css hacks https://codepen.io/edge0703/pen/iHJuA */
+.innerTable {
+    display: inline-block;
+    line-height: 150%;
+    width: -webkit-fill-available;
+}
+
+.cdk-column-menu {
+    padding: 0 16px 0 0 !important;
+}
+
+.multi-line-chip {
+    white-space: pre-line;
+}
+
+.user-menu {
+    min-width: 250px !important;
+}
+
+.mat-drawer-inner-container {
+    scrollbar-width: none; /* hide scrollbars in Firefox */
+    -ms-overflow-style: -ms-autohiding-scrollbar; /* hide scrollbars in Edge until the scrollable area is hovered */
+}
+
+.mat-drawer-inner-container::-webkit-scrollbar {
+    display: none !important; /* hide scrollbars in webkit browsers */
+}
+
+.small-spinner {
+    // 24px is the size of a normal icon
+    $spinner-size: 24px;
+    height: $spinner-size !important;
+    height: $spinner-size !important;
+    svg {
+        height: $spinner-size !important;
+        height: $spinner-size !important;
+    }
+}
+
+.import-table {
+    .table-container {
+        width: 100%;
+        overflow-x: scroll;
+        margin-top: 5px;
+    }
+
+    table {
+        width: 100%;
+        overflow: scroll;
+    }
+    .selection {
+        min-width: 80px;
+    }
+
+    .import-done {
+        background-color: #cfc;
+    }
+    .import-error {
+        background-color: #fcc;
+    }
+
+    .code {
+        padding-left: 1em;
+        font-style: italic;
+    }
+
+    div.wrapper {
+        display: flex;
+        vertical-align: bottom;
+        padding: 10px;
+    }
+
+    div.summary {
+        display: flex;
+    }
+
+    .hidden-input {
+        display: none;
+    }
+
+    .newBadge {
+        margin-left: -3px;
+    }
+
+    .first-column {
+        flex: 1;
+        min-width: 0px;
+    }
+
+    .filter-imports {
+        max-width: 50%;
+    }
+}
+
+.table-view-list-title {
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.queue {
+    .mat-expansion-panel-body {
+        padding: 0 !important;
+    }
+}
+
+.fake-button-no-touch {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    border-radius: 4px;
+}
+
+.fake-button {
+    @extend .fake-button-no-touch;
+    cursor: pointer;
+}
+
+.background-default[disabled] {
+    @extend .fake-disabled;
+}
+
+.dialog-title {
+    font-size: 20px;
+    font-weight: 500;
+    margin: 0;
+    padding: 0;
+}
+
+/* Custom hint and error classes. Same values as .mat-hint and -mat-error */
+.error {
+    font-size: 75%;
+    display: block;
+}
+mat-hint,
+.hint {
+    font-size: 10.5px;
+    display: block;
+    line-height: 1.5;
+}
+.hint-checkbox {
+    padding-left: 45px;
+    margin-top: -10px;
+}
+
+.hiddenCanvasElement {
+    display: none;
+}
+
+.text-gigantic {
+    font-size: 22px;
+}
+
+.text-large {
+    font-size: 22px;
+}
+
+.text-medium {
+    font-size: 14px;
+}
+
+.html-view {
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+.accessibility-h2 {
+    margin: 0 !important;
+    font-weight: 100 !important;
+    font-family:
+        OSFont,
+        Fira Sans,
+        Roboto,
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+.accessibility-h2-1 {
+    font-size: 100% !important;
+}
+
+.accessibility-h2-2 {
+    margin-top: 16px !important;
+}
+
+.accessibility-h2-3 {
+    margin-bottom: 16px !important;
+}
+
+.mock-h2 {
+    color: inherit !important;
+    padding: 0 !important;
+}

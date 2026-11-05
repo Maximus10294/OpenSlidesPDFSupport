@@ -1,0 +1,139 @@
+@use 'src/assets/styles/mixins/detail-view-appearance.scss';
+
+:host ::ng-deep .underlined-links {
+    @include detail-view-appearance.detail-view-appearance;
+}
+.broken-box {
+    position: relative;
+    margin-bottom: 15px;
+    padding-top: 0;
+    padding-right: 0;
+
+    .broken-action-row {
+        position: absolute;
+        right: 0;
+        font-size: 0.8em;
+        opacity: 0.5;
+        overflow: hidden;
+    }
+
+    .broken-motion-text {
+        padding-left: 40px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+}
+
+.broken-box-title {
+    color: red;
+    font-style: italic;
+    font-weight: bold;
+}
+
+.diff-box {
+    position: relative;
+    border-radius: 3px;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-right: 40px;
+
+    &:hover {
+        .action-row {
+            opacity: 1;
+        }
+    }
+    & {
+        .action-row {
+            position: absolute;
+            right: 0;
+            font-size: 0.8em;
+            opacity: 0.5;
+            overflow: hidden;
+
+            .btn-delete {
+                margin-left: 5px;
+                color: red;
+            }
+
+            .btn-edit {
+                margin-left: 5px;
+            }
+
+            .btn-amend-info {
+                margin-left: 5px;
+                min-width: 68px;
+            }
+        }
+
+        .amendment-cr-hint {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            padding: 0 12px;
+            color: var(--theme-primary-500);
+        }
+
+        .status-row {
+            display: flex;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            .collission-hint {
+                padding-right: 4px;
+            }
+
+            & > .status-content:last-child:after {
+                font-style: italic;
+                color: gray;
+                content: ':';
+            }
+        }
+    }
+}
+
+.amendment-origin {
+    margin-left: 30px;
+    font-style: italic;
+    color: gray;
+}
+
+.change-recommendation-summary {
+    border-radius: 3px;
+    padding: 0.5em 0 0 0.5em;
+    margin-bottom: 1em;
+
+    .summary-of-changes-scroll {
+        padding-top: 4px;
+        height: 100px;
+    }
+
+    .amendment-link {
+        margin-left: 0.3em;
+    }
+
+    ul {
+        padding: 0 0 0 32px;
+        list-style: none;
+        display: table;
+        margin-right: 1em;
+    }
+
+    li {
+        display: table-row;
+
+        & > * {
+            display: table-cell;
+            padding: 1px;
+        }
+    }
+    .mat-badge-content {
+        top: -8px !important;
+    }
+}
+
+.active-indicator {
+    font-size: 18px;
+    margin-left: 10px;
+    margin-right: 0;
+    margin-top: 3px;
+}

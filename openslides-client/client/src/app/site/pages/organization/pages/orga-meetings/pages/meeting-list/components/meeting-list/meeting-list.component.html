@@ -1,0 +1,249 @@
+<os-head-bar [multiSelectMode]="isMultiSelect">
+    <!-- Title -->
+    <div class="title-slot">
+        <h1 class="mock-h2" translate>Meetings</h1>
+    </div>
+
+    <!-- Menu -->
+    <!-- Only organization managers can do something -->
+    <ng-container *osOmlPerms="OML.superadmin" class="menu-slot">
+        <button mat-icon-button type="button" [matMenuTriggerFor]="meetingMenu">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+    </ng-container>
+
+    <!-- Multiselect info -->
+    <ng-container class="central-info-slot">
+        <button mat-icon-button (click)="toggleMultiSelect()"><mat-icon>arrow_back</mat-icon></button>
+        <span>{{ selectedRows.length }}&nbsp;{{ 'selected' | translate }}</span>
+    </ng-container>
+</os-head-bar>
+
+<os-list
+    [alwaysShowMenu]="true"
+    [filterProps]="['name', 'location', 'committeeName']"
+    [filterService]="filterService"
+    [hiddenInMobile]="['archived', 'description', 'meta', 'menu', 'committee']"
+    [listObservableProvider]="meetingController"
+    [multiSelect]="isMultiSelect"
+    [restricted]="restrictedColumns"
+    [sortService]="sortService"
+    [toRestrictFn]="toRestrictFn"
+    [vScrollFixed]="70"
+    [(selectedRows)]="selectedRows"
+>
+    <div
+        *osScrollingTableCell="'name'; row as meeting"
+        class="cell-slot fill"
+        [class.no-access]="isMultiSelect || !meeting.canAccess() || !meeting.canBeEnteredBy(operator.user)"
+    >
+        @if (!isMultiSelect && meeting.canAccess() && meeting.canBeEnteredBy(operator.user)) {
+            <a
+                class="stretch-to-fill-parent"
+                [attr.aria-label]="ariaLabel(meeting)"
+                [routerLink]="getMeetingUrl(meeting)"
+            ></a>
+        }
+        <div class="flex-vertical-center overflow-hidden">
+            <div class="nameCell overflow-hidden">
+                <div class="title-line title-box">
+                    <!-- Is Archived -->
+                    @if (meeting.isArchived) {
+                        <span class="icon-prefix">
+                            <mat-icon [matTooltip]="'Archived' | translate">archive</mat-icon>
+                        </span>
+                    }
+
+                    <!--- Is public -->
+                    @if (meeting.publicAccessPossible()) {
+                        <span class="icon-prefix">
+                            <mat-icon [matTooltip]="'Public' | translate">public</mat-icon>
+                        </span>
+                    }
+
+                    <!--- Is locked from inside -->
+                    @if (meeting.locked_from_inside) {
+                        <span class="icon-prefix">
+                            <mat-icon [matTooltip]="'Closed' | translate">lock</mat-icon>
+                        </span>
+                    }
+
+                    <!-- Is Template -->
+                    <span
+                        *osCmlPerms="CML.can_manage; committeeId: meeting.committee_id; and: meeting.isTemplate"
+                        class="icon-prefix"
+                    >
+                        <mat-icon [matTooltip]="'Public template' | translate">star</mat-icon>
+                    </span>
+
+                    <span class="ellipsis-overflow">{{ meeting.name | translate }}</span>
+                </div>
+
+                @if (meeting.location || meeting.start_time || meeting.end_time) {
+                    @let numIcons = meeting.isArchived + meeting.isTemplate + !!meeting.locked_from_inside;
+                    <div
+                        class="subtitle ellipsis-overflow"
+                        [ngClass]="{
+                            'align-w-title-w-one-icon': numIcons === 1,
+                            'align-w-title-w-two-icon': numIcons === 2
+                        }"
+                    >
+                        @if (meeting.location) {
+                            <span>{{ meeting.location }}</span>
+                        }
+                        @if (meeting.location && (meeting.start_time || meeting.end_time)) {
+                            <span>&nbsp;&middot;&nbsp;</span>
+                        }
+                        @if (meeting.start_time || meeting.end_time) {
+                            <span>
+                                <os-meeting-time [meeting]="meeting"></os-meeting-time>
+                            </span>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div *osScrollingTableCell="'committee'; row as meeting">
+        <div>
+            @if (meeting.committee?.name) {
+                <div class="ellipsis-overflow" style="position: relative">
+                    @if (!this.isMultiSelect && meeting.committee?.canAccess()) {
+                        <a
+                            class="stretch-to-fill-parent committee-link"
+                            [attr.aria-label]="ariaLabel(meeting, true)"
+                            [routerLink]="getCommitteeForMeetingUrl(meeting)"
+                        ></a>
+                    }
+                    @if (meeting.committee?.name) {
+                        <os-icon-container class="committee" icon="layers">
+                            {{ meeting.committee?.name | translate }}
+                        </os-icon-container>
+                    }
+                </div>
+            }
+            @if (meeting.organization_tags.length) {
+                <div class="ellipsis-overflow">
+                    <os-icon-container icon="local_offer">
+                        @for (tag of meeting.organization_tags; track tag) {
+                            <os-chip [color]="tag.color">
+                                {{ tag.name }}
+                            </os-chip>
+                        }
+                    </os-icon-container>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div
+        *osScrollingTableCell="'meta'; row as meeting; config: { width: 60 }"
+        [class.no-access]="isMultiSelect || !meeting.canAccess() || !meeting.canBeEnteredBy(operator.user)"
+    >
+        @if (!isMultiSelect && meeting.canAccess() && meeting.canBeEnteredBy(operator.user)) {
+            <a
+                class="stretch-to-fill-parent"
+                [attr.aria-label]="ariaLabel(meeting)"
+                [routerLink]="getMeetingUrl(meeting)"
+            ></a>
+        }
+        <div>
+            @if (meeting.userAmount) {
+                <div>
+                    <os-icon-container
+                        icon="group"
+                        iconTooltip="{{ 'Participants' | translate }}"
+                        iconTooltipPosition="right"
+                    >
+                        {{ meeting.userAmount }}
+                    </os-icon-container>
+                </div>
+            }
+            @if (meeting.motionsAmount) {
+                <div>
+                    <os-icon-container
+                        icon="assignment"
+                        iconTooltip="{{ 'Motions' | translate }}"
+                        iconTooltipPosition="right"
+                    >
+                        {{ meeting.motionsAmount }}
+                    </os-icon-container>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div *osScrollingTableCell="'menu'; row as meeting; config: { width: 40 }">
+        <button
+            *osCmlPerms="CML.can_manage; committeeId: meeting.committee?.id"
+            data-cy="meetingListSingleMenuTrigger"
+            mat-icon-button
+            [disabled]="isMultiSelect"
+            [matMenuTriggerData]="{ meeting: meeting }"
+            [matMenuTriggerFor]="singleMeetingMenu"
+            (click)="$event.stopPropagation()"
+        >
+            <mat-icon>more_vert</mat-icon>
+        </button>
+    </div>
+</os-list>
+
+<mat-menu #singleMeetingMenu="matMenu">
+    <ng-template let-meeting="meeting" matMenuContent>
+        @if (!meeting.isArchived) {
+            <button data-cy="meetingListSingleEditButton" mat-menu-item type="button" (click)="editSingle(meeting)">
+                <mat-icon>edit</mat-icon>
+                <span>
+                    {{ 'Edit' | translate }}
+                </span>
+            </button>
+        }
+        <button
+            class="red-warning-text"
+            data-cy="meetingListSingleDeleteButton"
+            mat-menu-item
+            type="button"
+            (click)="doDelete(meeting)"
+        >
+            <mat-icon>delete</mat-icon>
+            <span>
+                {{ 'Delete' | translate }}
+            </span>
+        </button>
+    </ng-template>
+</mat-menu>
+
+<mat-menu #meetingMenu="matMenu">
+    @if (!isMultiSelect) {
+        <div>
+            <button mat-menu-item (click)="csvExportMeetingList()">
+                <mat-icon>archive</mat-icon>
+                <span>{{ 'Export as CSV' | translate }}</span>
+            </button>
+            <button mat-menu-item (click)="toggleMultiSelect()">
+                <mat-icon>library_add</mat-icon>
+                <span>{{ 'Multiselect' | translate }}</span>
+            </button>
+        </div>
+    }
+    @if (isMultiSelect) {
+        <div>
+            <button mat-menu-item (click)="selectAll()">
+                <mat-icon>done_all</mat-icon>
+                <span>{{ 'Select all' | translate }}</span>
+            </button>
+            <button mat-menu-item [disabled]="!selectedRows.length" (click)="deselectAll()">
+                <mat-icon>clear</mat-icon>
+                <span>{{ 'Deselect all' | translate }}</span>
+            </button>
+            <ng-container *osOmlPerms="OML.superadmin">
+                <mat-divider></mat-divider>
+                <button class="red-warning-text" mat-menu-item [disabled]="!selectedRows.length" (click)="doDelete()">
+                    <mat-icon>delete</mat-icon>
+                    <span>{{ 'Delete' | translate }}</span>
+                </button>
+            </ng-container>
+        </div>
+    }
+</mat-menu>

@@ -1,0 +1,22 @@
+.motion-content {
+    padding: 8px 0;
+}
+
+h1 + mat-dialog-content {
+    color: var(--mat-button-outlined-state-layer-color, inherit);
+}
+
+.small-icon {
+    font-size: 12px;
+    height: 12px;
+    width: 12px;
+    cursor: pointer;
+}
+
+.margin-right-small {
+    margin-right: 10px;
+}
+
+.width-medium {
+    width: 300px;
+}

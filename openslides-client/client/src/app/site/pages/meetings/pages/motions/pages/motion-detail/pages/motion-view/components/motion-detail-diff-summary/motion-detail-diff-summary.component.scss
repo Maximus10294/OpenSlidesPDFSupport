@@ -1,0 +1,40 @@
+@use 'src/assets/styles/mixins/button.scss';
+
+.change-recommendation-summary {
+    border-radius: 3px;
+    padding: 0.5em 0 0 0.5em;
+    margin-bottom: 1em;
+
+    .summary-of-changes-scroll {
+        padding-top: 4px;
+        height: 100px;
+    }
+
+    .amendment-link {
+        margin-left: 0.3em;
+    }
+
+    ul.changes-list {
+        padding: 0 0 0 2em;
+        margin-right: 1em;
+        width: calc(100% - 3em);
+        list-style: none;
+        display: table;
+    }
+
+    li {
+        display: table-row;
+
+        & > * {
+            display: table-cell;
+            padding: 1px;
+        }
+    }
+    .mat-badge-content {
+        top: -8px !important;
+    }
+}
+
+.mat-mdc-icon-button.smaller-icon-button {
+    @include button.custom-size-button(24px, 14px);
+}

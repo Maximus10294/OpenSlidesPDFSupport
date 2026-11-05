@@ -1,0 +1,16 @@
+.inline-form {
+    display: flex;
+    align-items: center;
+
+    .delete-button {
+        margin-left: 4px;
+    }
+
+    .sep-line {
+        margin: 0 8px;
+
+        &.grey-out {
+            color: rgba(0, 0, 0, 0.26);
+        }
+    }
+}

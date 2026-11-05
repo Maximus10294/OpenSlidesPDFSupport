@@ -1,0 +1,87 @@
+<os-head-bar
+    [hasMainButton]="isOrgaManager"
+    [mainActionTooltip]="'New tag' | translate"
+    [multiSelectMode]="isMultiSelect"
+    (mainEvent)="createOrganizationTag()"
+>
+    <!-- Title -->
+    <div class="title-slot">
+        <h1 class="mock-h2" translate>Tags</h1>
+    </div>
+
+    <!-- Menu -->
+    @if (isOrgaManager) {
+        <ng-container class="menu-slot">
+            <button mat-icon-button type="button" [matMenuTriggerFor]="orgaTagMenu">
+                <mat-icon>more_vert</mat-icon>
+            </button>
+        </ng-container>
+    }
+
+    <!-- Multiselect info -->
+    <ng-container class="central-info-slot">
+        <button mat-icon-button (click)="toggleMultiSelect()"><mat-icon>arrow_back</mat-icon></button>
+        <span>{{ selectedRows.length }}&nbsp;{{ 'selected' | translate }}</span>
+    </ng-container>
+</os-head-bar>
+
+<os-list
+    listStorageKey="orgaTags"
+    [filterProps]="['name']"
+    [hiddenInMobile]="['info', 'menu']"
+    [listObservable]="repo.getViewModelListObservable()"
+    [multiSelect]="isMultiSelect"
+    [vScrollFixed]="60"
+    [(selectedRows)]="selectedRows"
+>
+    <div *osScrollingTableCell="'name'; row as orgaTag" class="cell-slot fill">
+        <div>
+            <os-chip [color]="orgaTag.color">{{ orgaTag.name }}</os-chip>
+        </div>
+    </div>
+    @if (isOrgaManager) {
+        <div *osScrollingTableCell="'edit'; row as orgaTag; config: { width: 40 }" class="cell-slot fill">
+            <button mat-icon-button (click)="editOrganizationTag(orgaTag)">
+                <mat-icon>edit</mat-icon>
+            </button>
+        </div>
+        <div *osScrollingTableCell="'delete'; row as orgaTag; config: { width: 40 }" class="cell-slot fill">
+            <button color="warn" mat-icon-button (click)="deleteOrganizationTags(orgaTag)">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
+    }
+</os-list>
+
+<mat-menu #orgaTagMenu="matMenu">
+    @if (!isMultiSelect) {
+        <div>
+            <button mat-menu-item (click)="toggleMultiSelect()">
+                <mat-icon>library_add</mat-icon>
+                <span>{{ 'Multiselect' | translate }}</span>
+            </button>
+        </div>
+    }
+    @if (isMultiSelect) {
+        <div>
+            <button mat-menu-item (click)="selectAll()">
+                <mat-icon>done_all</mat-icon>
+                <span>{{ 'Select all' | translate }}</span>
+            </button>
+            <button mat-menu-item [disabled]="!selectedRows.length" (click)="deselectAll()">
+                <mat-icon>clear</mat-icon>
+                <span>{{ 'Deselect all' | translate }}</span>
+            </button>
+            <mat-divider></mat-divider>
+            <button
+                class="red-warning-text"
+                mat-menu-item
+                [disabled]="!selectedRows.length"
+                (click)="deleteSelectedTags()"
+            >
+                <mat-icon>delete</mat-icon>
+                <span>{{ 'Delete' | translate }}</span>
+            </button>
+        </div>
+    }
+</mat-menu>

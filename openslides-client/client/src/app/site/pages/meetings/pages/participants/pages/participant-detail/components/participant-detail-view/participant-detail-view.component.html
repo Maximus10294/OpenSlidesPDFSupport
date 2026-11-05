@@ -1,0 +1,210 @@
+<os-head-bar
+    mainButtonIcon="edit"
+    [goBack]="!isAllowed('seeOtherUsers')"
+    [hasMainButton]="isAllowed('changePersonal') && !!user"
+    [mainActionTooltip]="'Edit' | translate"
+    [nav]="false"
+    (mainEvent)="setEditMode()"
+>
+    <!-- Title -->
+    <div class="title-slot">
+        <h1 class="mock-h2">
+            @if (user) {
+                {{ user.full_name }}
+            }
+        </h1>
+    </div>
+
+    <!-- Menu -->
+    <ng-container class="menu-slot">
+        @if (isAllowed('changePersonal') && isAllowed('changePassword') && user) {
+            <button mat-icon-button type="button" [matMenuTriggerFor]="userExtraMenu">
+                <mat-icon>more_vert</mat-icon>
+            </button>
+        }
+    </ng-container>
+
+    <mat-menu #userExtraMenu="matMenu">
+        @if (!user?.saml_id && isAllowed('changePassword') && operatorHasEqualOrHigherOML) {
+            <button mat-menu-item (click)="changePassword()">
+                <mat-icon>security</mat-icon>
+                <span>{{ 'Change password' | translate }}</span>
+            </button>
+        }
+        <!-- invitation email -->
+        @if (isAllowed('update') && user && user.email) {
+            <button mat-menu-item (click)="sendInvitationEmail()">
+                <mat-icon>mail</mat-icon>
+                <span>{{ 'Send invitation email' | translate }}</span>
+            </button>
+        }
+        <!-- PDF -->
+        @if (isAllowed('update')) {
+            <button mat-menu-item (click)="onDownloadPdf()">
+                <mat-icon>picture_as_pdf</mat-icon>
+                <span>{{ 'PDF' | translate }}</span>
+            </button>
+        }
+        <div *osOmlPerms="OML.can_manage_organization">
+            <button mat-menu-item (click)="goToHistory()">
+                <mat-icon>history</mat-icon>
+                <span>{{ 'History' | translate }}</span>
+            </button>
+        </div>
+        <!-- delete button -->
+        @if (isAllowed('delete') && !isMeetingAdminAndEditSelf) {
+            <div>
+                <mat-divider></mat-divider>
+                <button class="red-warning-text" mat-menu-item (click)="deleteUserButton()">
+                    <mat-icon>delete</mat-icon>
+                    <span>{{ 'Delete' | translate }}</span>
+                </button>
+            </div>
+        }
+    </mat-menu>
+</os-head-bar>
+
+@if (user) {
+    <os-user-detail-view
+        [additionalFormControls]="additionalFormControls"
+        [isAllowedFn]="isAllowedFn"
+        [isEditing]="false"
+        [patchFormValueFn]="patchFormValueFn"
+        [user]="user"
+    >
+        <ng-template #showView>
+            <h2>{{ 'Meeting specific information' | translate }}</h2>
+            @if (isAllowed('seeSensitiveData') && user?.isLastEmailSent) {
+                <div>
+                    <div>
+                        <h4>{{ 'Last email sent' | translate }}</h4>
+                        <span>{{ user.last_email_sent | localizedDate }}</span>
+                    </div>
+                </div>
+            }
+            @if (isAllowed('seePersonal') && user?.isLastLogin) {
+                <div>
+                    <div>
+                        <h4>{{ 'Last login' | translate }}</h4>
+                        <span>{{ user.last_login | localizedDate }}</span>
+                    </div>
+                </div>
+            }
+            <!-- Participant number -->
+            @if (user?.number()) {
+                <div>
+                    <h4>{{ 'Participant number' | translate }}</h4>
+                    <span>{{ user!.number() }}</span>
+                </div>
+            }
+            <!-- Structure level -->
+            @if (usersStructureLevels && usersStructureLevels.length > 0) {
+                <div>
+                    <h4>{{ 'Structure level' | translate }}</h4>
+                    <os-comma-separated-listing [list]="usersStructureLevels">
+                        <ng-template let-structureLevel>{{ structureLevel }}</ng-template>
+                    </os-comma-separated-listing>
+                </div>
+            }
+            <!-- Groups -->
+            @if (usersGroups && usersGroups.length > 0) {
+                <div>
+                    <h4>{{ 'Groups' | translate }}</h4>
+                    <os-comma-separated-listing [list]="usersGroups">
+                        <ng-template let-group>{{ group.getTitle() }}</ng-template>
+                    </os-comma-separated-listing>
+                </div>
+            }
+            @if (!usersGroups || usersGroups?.length === 0) {
+                <div>
+                    <h4>{{ 'Groups' | translate }}</h4>
+                    <span>{{ 'Default group' | translate }}</span>
+                </div>
+            }
+            <!-- Own Vote delegations -->
+            @if (user?.vote_delegated_to() && showVoteDelegations) {
+                <div>
+                    <h4>{{ 'Voting right delegated to (proxy)' | translate }}</h4>
+                    <span>{{ user!.vote_delegated_to() }}</span>
+                </div>
+            }
+            <!-- Received Vote delegations -->
+            @if (showVoteDelegations && user!.vote_delegations_from().length > 0) {
+                <div>
+                    <h4>
+                        {{ 'Principals' | translate }}
+                    </h4>
+                    <os-expandable-content-wrapper
+                        [biggerHeight]="true"
+                        [disableExpandControl]="disableExpandControl"
+                        [isCollapsed]="true"
+                    >
+                        <ul>
+                            @for (delegation of user!.vote_delegations_from(); track delegation) {
+                                <li>{{ delegation }}</li>
+                            }
+                        </ul>
+                    </os-expandable-content-wrapper>
+                </div>
+            }
+            <!-- Vote weight -->
+            @if (showVoteWeight) {
+                <div>
+                    <h4>{{ 'Vote weight' | translate }}</h4>
+                    <span>{{ user?.vote_weight() }}</span>
+                </div>
+            }
+            @if (isAllowed('seeName')) {
+                <div>
+                    <!-- About me -->
+                    @if (user?.about_me()) {
+                        <div>
+                            <h4>{{ 'About me' | translate }}</h4>
+                            <div class="detail-view" [innerHTML]="user!.about_me() | trust: 'html'"></div>
+                        </div>
+                    }
+                </div>
+            }
+            @if (isAllowed('update')) {
+                <div>
+                    <!-- Comment -->
+                    @if (user?.comment()) {
+                        <div>
+                            <h4>{{ 'Comment' | translate }}</h4>
+                            <span>{{ user!.comment() }}</span>
+                        </div>
+                    }
+                </div>
+            }
+            @if (isAllowed('seeName')) {
+                <div class="flex-vertical-center margin-top-12">
+                    <mat-icon class="margin-4">
+                        {{ user!.isPresentInMeeting() ? 'check_box' : 'check_box_outline_blank' }}
+                    </mat-icon>
+                    <span>{{ (user?.isPresentInMeeting() ? 'Is present' : 'Is not present') | translate }}</span>
+                </div>
+                <div class="flex-vertical-center margin-top-12">
+                    <!-- Locked out? -->
+                    @if (isAllowed('seeSensitiveData')) {
+                        <mat-icon class="margin-4" [class.red-warning-text]="user!.isLockedOutOfMeeting()">
+                            {{ user!.isLockedOutOfMeeting() ? 'visibility_off' : '' }}
+                        </mat-icon>
+                        <span>
+                            {{ (user?.isLockedOutOfMeeting() ? 'Is locked out' : '') | translate }}
+                        </span>
+                    }
+                </div>
+            }
+            @if (isAllowed('seeSensitiveData') && user?.home_committee_id) {
+                <h2>{{ 'Organization specific information' | translate }}</h2>
+                <!-- Home committee -->
+                <div>
+                    <h4>{{ 'Home committee' | translate }}</h4>
+                    <a [routerLink]="'/committees/' + user.home_committee_id">
+                        {{ user.home_committee.name }}
+                    </a>
+                </div>
+            }
+        </ng-template>
+    </os-user-detail-view>
+}

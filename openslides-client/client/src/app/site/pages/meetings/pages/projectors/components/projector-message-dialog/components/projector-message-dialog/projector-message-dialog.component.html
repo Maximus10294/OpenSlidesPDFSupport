@@ -1,0 +1,27 @@
+<h1 mat-dialog-title>
+    <span>{{ 'Message' | translate }}</span>
+</h1>
+
+<form [formGroup]="messageForm">
+    <mat-dialog-content>
+        <!-- Message -->
+        <os-editor formControlName="message"></os-editor>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <!-- Submit countdown button -->
+        <button
+            color="accent"
+            mat-button
+            type="submit"
+            [disabled]="!messageForm.valid"
+            [mat-dialog-close]="messageForm.value"
+        >
+            <span>{{ 'Save' | translate }}</span>
+        </button>
+
+        <!-- Cancel countdown button -->
+        <button mat-button type="button" [mat-dialog-close]="null">
+            <span>{{ 'Cancel' | translate }}</span>
+        </button>
+    </mat-dialog-actions>
+</form>

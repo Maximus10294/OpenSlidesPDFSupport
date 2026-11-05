@@ -1,0 +1,18 @@
+<h1 mat-dialog-title>{{ 'Edit details for' | translate }} {{ block.title }}</h1>
+<mat-dialog-content class="os-form-card-mobile">
+    <form class="edit-form" tabindex="-1" [formGroup]="blockEditForm" (ngSubmit)="saveBlock()">
+        <mat-form-field>
+            <mat-label>{{ 'Title' | translate }}</mat-label>
+            <input formControlName="title" matInput osAutofocus required />
+        </mat-form-field>
+        <mat-checkbox formControlName="internal">Internal</mat-checkbox>
+    </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button color="accent" mat-button type="submit" [disabled]="!blockEditForm.valid" (click)="saveBlock()">
+        <span>{{ 'Save' | translate }}</span>
+    </button>
+    <button mat-button type="button" [mat-dialog-close]="null">
+        <span>{{ 'Cancel' | translate }}</span>
+    </button>
+</mat-dialog-actions>

@@ -1,0 +1,52 @@
+<cdk-tree
+    #osTree="cdkDropList"
+    cdkDropList
+    [cdkDropListData]="osTreeData"
+    [dataSource]="dataSource"
+    [treeControl]="treeControl"
+    (cdkDropListSorted)="sortItems($event)"
+>
+    <cdk-tree-node
+        *cdkTreeNodeDef="let node"
+        cdkDrag
+        [cdkDragData]="node"
+        [style.display]="shouldRender(node) ? 'flex' : 'none'"
+        [style.padding-left]="node.level * 40 + 'px'"
+        (cdkDragDropped)="onDrop(node)"
+        (cdkDragMoved)="moveItem($event)"
+        (cdkDragStarted)="startsDrag($event, node)"
+        (click)="onItemClick($event, node.id)"
+        (keyup)="onItemClick($event, node)"
+        (mousedown)="mouseDown($event)"
+        (mouseup)="mouseUp()"
+        (touchend)="mouseUp()"
+        (touchstart)="touchStart($event)"
+    >
+        <div
+            class="sorting-tree-node-container backgroundColorLight background-default"
+            [ngClass]="isSelectedRow(node.id) ? 'backgroundSelected' : 'backgroundColorLight'"
+        >
+            <span cdkDragHandle class="flex-center">
+                <mat-icon>drag_indicator</mat-icon>
+            </span>
+            @if (hasChild) {
+                <button
+                    cdkTreeNodeToggle
+                    mat-icon-button
+                    [attr.aria-label]="'toggle ' + node.filename"
+                    [style.visibility]="node.expandable ? 'visible' : 'hidden'"
+                    (click)="handleClick(node)"
+                >
+                    <mat-icon
+                        class="mat-icon-rtl-mirror"
+                        [style.transform]="node.isExpanded ? 'rotate(90deg)' : 'rotate(0deg)'"
+                    >
+                        chevron_right
+                    </mat-icon>
+                </button>
+            }
+            <ng-container [ngTemplateOutlet]="innerNode" [ngTemplateOutletContext]="{ item: node.item }"></ng-container>
+        </div>
+        <div *cdkDragPlaceholder [style.margin-left]="placeholderLevel * 40 + 'px'"></div>
+    </cdk-tree-node>
+</cdk-tree>

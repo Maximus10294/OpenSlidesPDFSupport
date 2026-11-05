@@ -1,0 +1,114 @@
+@use 'src/assets/styles/tables.scss';
+@use 'src/assets/styles/variables.scss';
+@use 'src/app/site/pages/meetings/pages/motions/styles/motion-list-styles.scss';
+@use 'src/assets/styles/themes/typography.scss';
+
+// Determine the distance between the top edge to the start of the table content
+$text-margin-top: 10px;
+
+.projector-button {
+    margin: auto;
+}
+
+.column-number {
+    margin-top: $text-margin-top;
+    word-break: break-all;
+}
+
+.column-title {
+    margin-top: $text-margin-top;
+    & h1 {
+        font-family: typography.$font-family;
+        padding-bottom: 0%;
+        font-weight: 500;
+        font-size: 16px;
+        color: var(--mat-sidenav-content-text-color, var(--mat-sys-on-background));
+    }
+}
+
+.column-state {
+    margin-top: $text-margin-top;
+    width: inherit;
+
+    .mat-icon {
+        font-size: 150%;
+    }
+}
+
+os-grid-layout {
+    .color-select {
+        width: 100%;
+        padding: 0 8px;
+    }
+    .tile-block-title {
+        font-size: 36px;
+
+        .mat-icon {
+            font-size: 36px;
+            width: 36px;
+            height: 36px;
+        }
+
+        .mat-badge-content {
+            right: -22px;
+            top: -11px;
+            font-size: 16px;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+        }
+    }
+}
+
+.motion-tile-card {
+    padding: 0;
+    height: 100%;
+    cursor: pointer;
+
+    & > div {
+        display: grid;
+        grid-template-columns: 30% 70%;
+
+        .tile-content-prefix {
+            font-size: 36px;
+
+            .mat-icon {
+                font-size: 36px;
+                width: 36px;
+                height: 36px;
+            }
+
+            .mat-badge-content {
+                right: -22px;
+                top: -11px;
+                font-size: 16px;
+                width: 30px;
+                height: 30px;
+                line-height: 30px;
+            }
+        }
+
+        .tile-content-name {
+            padding: 8px 16px;
+            font-weight: unset;
+            margin-bottom: 0;
+            overflow: hidden;
+
+            @include variables.desktop {
+                font-size: calc(10px + 0.5vmax);
+            }
+
+            @media (max-width: 960px) {
+                font-size: calc(11px + 1vw);
+            }
+
+            @media (max-width: 700px) {
+                font-size: calc(12px + 1vmin);
+            }
+        }
+    }
+}
+
+.non-overflowing-chip {
+    max-width: calc(100% - 20px);
+}

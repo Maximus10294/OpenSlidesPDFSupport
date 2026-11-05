@@ -1,0 +1,39 @@
+<os-head-bar
+    [editMode]="isEditing"
+    [hasMainButton]="canManage()"
+    [isSaveButtonEnabled]="startForm.valid"
+    [mainActionTooltip]="'Edit' | translate"
+    [mainButtonIcon]="'edit'"
+    (cancelEditEvent)="isEditing = !isEditing"
+    (mainEvent)="editStartPage()"
+    (saveEvent)="saveChanges()"
+>
+    <div class="title-slot">
+        <h1 class="mock-h2" translate>Home</h1>
+    </div>
+</os-head-bar>
+
+<mat-card class="spacer-bottom-60 os-card">
+    <mat-card-content>
+        @if (!isEditing) {
+            <div class="underlined-links" id="start-page-content">
+                @if (welcomeTitleObservable | async; as welcomeTitle) {
+                    <h1>{{ welcomeTitle }}</h1>
+                }
+                @if (welcomeTextObservable | async; as welcomeText) {
+                    <div class="html-view" [innerHTML]="welcomeText | trust: 'html'"></div>
+                }
+            </div>
+        }
+        @if (isEditing) {
+            <form [formGroup]="startForm">
+                <mat-form-field>
+                    <mat-label>{{ 'Front page title' | translate }}</mat-label>
+                    <input formControlName="welcome_title" matInput required />
+                    <mat-error>{{ 'The title is required' | translate }}</mat-error>
+                </mat-form-field>
+                <os-editor formControlName="welcome_text" [allowEmbeds]="true"></os-editor>
+            </form>
+        }
+    </mat-card-content>
+</mat-card>

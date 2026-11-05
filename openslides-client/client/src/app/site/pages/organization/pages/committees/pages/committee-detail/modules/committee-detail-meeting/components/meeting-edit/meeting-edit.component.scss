@@ -1,0 +1,18 @@
+.meeting-form {
+    display: grid;
+    min-width: 100px;
+    max-width: 100%;
+    margin: auto;
+
+    mat-card {
+        width: 100%;
+    }
+
+    mat-form-field {
+        display: block;
+    }
+
+    p.has-hint {
+        margin-top: 0;
+    }
+}

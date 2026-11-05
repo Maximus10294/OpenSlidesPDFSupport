@@ -1,0 +1,128 @@
+<os-head-bar
+    [hasMainButton]="true"
+    [mainActionTooltip]="'New category' | translate"
+    [multiSelectMode]="isMultiSelect"
+    [nav]="false"
+    (mainEvent)="onNewButton(newWorkflowDialog)"
+>
+    <!-- Title -->
+    <div class="title-slot">
+        <h1 class="mock-h2" translate>Workflows</h1>
+    </div>
+    <!-- Menu -->
+    <ng-container class="menu-slot">
+        <button mat-icon-button type="button" [matMenuTriggerFor]="workflowListMenu">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+    </ng-container>
+
+    <!-- Multiselect info -->
+    <ng-container class="central-info-slot">
+        <button mat-icon-button (click)="toggleMultiSelect()"><mat-icon>arrow_back</mat-icon></button>
+        <span>{{ selectedRows.length }}&nbsp;{{ 'selected' | translate }}</span>
+    </ng-container>
+</os-head-bar>
+
+<os-projectable-list
+    [allowProjector]="false"
+    [filterProps]="filterProps"
+    [hiddenInMobile]="['menu']"
+    [listObservableProvider]="workflowRepo"
+    [multiSelect]="isMultiSelect"
+    [showListOfSpeakers]="false"
+    [(selectedRows)]="selectedRows"
+>
+    <!-- Name column -->
+    <div
+        *osScrollingTableCell="'name'; value as name; row as workflow; rowContext as rowContext"
+        class="cell-slot fill"
+    >
+        @if (!isMultiSelect) {
+            <os-detail-view-navigator [model]="workflow"></os-detail-view-navigator>
+        }
+        <div>{{ name }}</div>
+    </div>
+
+    <!-- Delete column -->
+    <div
+        *osScrollingTableCell="'delete'; row as workflow; config: { width: 40, position: END_POSITION }"
+        class="cell-slot fill"
+    >
+        @if (!isMultiSelect) {
+            <button
+                mat-icon-button
+                matTooltip="{{ 'Delete' | translate }}"
+                type="button"
+                (click)="onDeleteWorkflow(workflow)"
+            >
+                <mat-icon color="warn">delete</mat-icon>
+            </button>
+        }
+    </div>
+</os-projectable-list>
+
+<!-- New workflow dialog -->
+<ng-template #newWorkflowDialog>
+    <h1 mat-dialog-title>
+        <span>{{ 'New workflow' | translate }}</span>
+    </h1>
+    <mat-dialog-content class="os-form-card-mobile">
+        <p>{{ 'Please enter a name for the new workflow:' | translate }}</p>
+        <mat-form-field>
+            <input matInput osAutofocus required [(ngModel)]="newWorkflowTitle" />
+        </mat-form-field>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button
+            color="accent"
+            mat-button
+            type="submit"
+            [disabled]="newWorkflowTitle === ''"
+            [mat-dialog-close]="newWorkflowTitle"
+        >
+            <span>{{ 'Save' | translate }}</span>
+        </button>
+        <button mat-button type="button" [mat-dialog-close]="null">
+            <span>{{ 'Cancel' | translate }}</span>
+        </button>
+    </mat-dialog-actions>
+</ng-template>
+
+<mat-menu #workflowListMenu="matMenu">
+    <ng-template matMenuContent>
+        @if (!isMultiSelect) {
+            <div>
+                <!-- Enable multi select -->
+                <button mat-menu-item (click)="toggleMultiSelect()">
+                    <mat-icon>library_add</mat-icon>
+                    <span>{{ 'Multiselect' | translate }}</span>
+                </button>
+                <mat-divider></mat-divider>
+                <!-- Import -->
+                <button mat-menu-item routerLink="import">
+                    <mat-icon>cloud_upload</mat-icon>
+                    <span>{{ 'Import' | translate }}</span>
+                </button>
+            </div>
+        }
+        @if (isMultiSelect) {
+            <div>
+                <!-- Select all -->
+                <button mat-menu-item (click)="selectAll()">
+                    <mat-icon>done_all</mat-icon>
+                    <span>{{ 'Select all' | translate }}</span>
+                </button>
+                <!-- Deselect all -->
+                <button mat-menu-item [disabled]="!selectedRows.length" (click)="deselectAll()">
+                    <mat-icon>clear</mat-icon>
+                    <span>{{ 'Deselect all' | translate }}</span>
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item [disabled]="!selectedRows.length" (click)="exportWorkflows()">
+                    <mat-icon>archive</mat-icon>
+                    <span>{{ 'Export' | translate }}</span>
+                </button>
+            </div>
+        }
+    </ng-template>
+</mat-menu>

@@ -1,0 +1,52 @@
+@if (contentForm) {
+    <div class="attachment-container">
+        <form [formGroup]="formGroup">
+            <mat-form-field>
+                <mat-label>{{ 'Attachments' | translate }}</mat-label>
+                <os-repo-search-selector
+                    class="selector"
+                    formControlName="mediafile_ids"
+                    [multiple]="true"
+                    [pipeFn]="getMediafilesPipeFn()"
+                    [repo]="repo"
+                ></os-repo-search-selector>
+            </mat-form-field>
+        </form>
+        <button
+            *osPerms="permission.mediafileCanManage"
+            mat-icon-button
+            type="button"
+            (click)="openUploadDialog(uploadDialog)"
+        >
+            <mat-icon>cloud_upload</mat-icon>
+        </button>
+    </div>
+}
+
+<!-- upload file dialog -->
+<ng-template #uploadDialog>
+    <mat-card-content>
+        <h1 mat-dialog-title>
+            <span>{{ 'New file' | translate }}</span>
+        </h1>
+        <os-media-upload-content
+            [directories]="directoriesObservable"
+            [uploadFn]="uploadFn"
+            (errorEvent)="uploadError($event)"
+            (uploadSuccessEvent)="uploadSuccess($event.uploadedIds)"
+        >
+            <div *osScrollingTableCell="'access_groups'; row as file" class="cell-slot">
+                <form [formGroup]="file.form">
+                    <mat-form-field subscriptSizing="dynamic">
+                        <mat-label>{{ 'Restrictions' | translate }}</mat-label>
+                        <os-list-search-selector
+                            formControlName="access_group_ids"
+                            [inputListValues]="availableGroups"
+                            [multiple]="true"
+                        ></os-list-search-selector>
+                    </mat-form-field>
+                </form>
+            </div>
+        </os-media-upload-content>
+    </mat-card-content>
+</ng-template>

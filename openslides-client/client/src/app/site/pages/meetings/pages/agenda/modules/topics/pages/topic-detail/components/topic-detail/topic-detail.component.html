@@ -1,0 +1,212 @@
+<os-detail-view [collection]="COLLECTION" (idFound)="onIdFound($event)">
+    <os-head-bar
+        mainButtonIcon="edit"
+        [editMode]="editTopic"
+        [goBack]="false"
+        [hasMainButton]="isAllowed('edit') && !!topic"
+        [isSaveButtonEnabled]="topicForm!.valid"
+        [mainActionTooltip]="'Edit' | translate"
+        [nav]="false"
+        [prevUrl]="prevUrl"
+        [saveAction]="getSaveAction()"
+        (mainEvent)="setEditMode(!editTopic)"
+    >
+        <!-- Title -->
+        <div class="title-slot">
+            <h1 class="mock-h2">
+                @if (newTopic) {
+                    {{ 'New topic' | translate }}
+                } @else if (editTopic) {
+                    {{ 'Edit topic' | translate }}
+                } @else if (topic) {
+                    {{ 'Topic' | translate }}
+                }
+            </h1>
+        </div>
+
+        <!-- Back and forth buttons -->
+        @if (!editTopic && showNavigateButtons) {
+            <div class="extra-controls-slot">
+                <button mat-button [disabled]="!previousTopic" (click)="navigateToTopic(previousTopic)">
+                    <os-icon-container icon="chevron_left">
+                        {{ getNavDisplay(previousTopic) }}
+                    </os-icon-container>
+                </button>
+                <button mat-button [disabled]="!nextTopic" (click)="navigateToTopic(nextTopic)">
+                    <os-icon-container icon="chevron_right" [swap]="true">
+                        {{ getNavDisplay(nextTopic) }}
+                    </os-icon-container>
+                </button>
+            </div>
+        }
+
+        <!-- Menu -->
+        <div
+            *osPerms="[
+                permission.agendaItemCanManage,
+                permission.listOfSpeakersCanSee,
+                permission.listOfSpeakersCanBeSpeaker
+            ]"
+            class="menu-slot"
+        >
+            @if (topic) {
+                <button mat-icon-button type="button" [matMenuTriggerFor]="topicExtraMenu">
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+            }
+        </div>
+    </os-head-bar>
+
+    @if ((topic || editTopic) && (hasLoaded | async)) {
+        <mat-card class="spacer-bottom-60 os-card">
+            <mat-card-content>
+                @if (!editTopic && topic) {
+                    <os-projectable-title [getTitleFn]="getTitleFn" [model]="topic" />
+                    <div>
+                        @if (topic.text) {
+                            <span>
+                                <!-- Render topic text as HTML -->
+                                <div class="detail-view html-view" [innerHTML]="topic.text | trust: 'html'"></div>
+                            </span>
+                        }
+                    </div>
+
+                    @if (topic.hasAttachments()) {
+                        <div>
+                            <h3>
+                                <span>{{ 'Attachments' | translate }}</span>
+                                :
+                            </h3>
+                            <mat-list dense>
+                                @for (file of sortedAttachments; track file) {
+                                    <mat-list-item class="attachment-entry">
+                                        <a target="_blank" [routerLink]="file.url">
+                                            <mat-icon class="attachment-icon">{{ file.getIcon() }}</mat-icon>
+                                            {{ file.getTitle() }}
+                                        </a>
+                                    </mat-list-item>
+                                }
+                            </mat-list>
+                        </div>
+                    }
+                }
+
+                @if (editTopic && topicForm) {
+                    <form tabindex="-1" [formGroup]="topicForm">
+                        <div>
+                            <mat-form-field>
+                                <mat-label>{{ 'Title' | translate }}</mat-label>
+                                <input formControlName="title" matInput osAutofocus required type="text" />
+                                @if (topicForm!.invalid) {
+                                    <mat-error>{{ 'A name is required' | translate }}</mat-error>
+                                }
+                            </mat-form-field>
+                        </div>
+
+                        <!-- The editor -->
+                        <div class="spacer-bottom-20">
+                            <h4>{{ 'Text' | translate }}</h4>
+                            <os-editor formControlName="text" [allowEmbeds]="true"></os-editor>
+                        </div>
+
+                        <!-- Attachments -->
+                        <os-attachment-control formControlName="attachment_mediafile_ids"></os-attachment-control>
+
+                        @if (newTopic) {
+                            <div>
+                                <!-- Visibility -->
+                                <div>
+                                    <mat-form-field>
+                                        <mat-label>{{ 'Agenda visibility' | translate }}</mat-label>
+                                        <mat-select formControlName="agenda_type">
+                                            @for (type of itemVisibility; track type) {
+                                                <mat-option [value]="type.key">
+                                                    <span>{{ type.name | translate }}</span>
+                                                </mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+
+                                <!-- Parent item -->
+                                <div>
+                                    <mat-form-field>
+                                        <mat-label>{{ 'Parent agenda item' | translate }}</mat-label>
+                                        <os-list-search-selector
+                                            formControlName="agenda_parent_id"
+                                            [includeNone]="true"
+                                            [inputListValues]="itemObserver"
+                                        ></os-list-search-selector>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        } @else {
+                            <div class="apply-button">
+                                @if (applyFeedback) {
+                                    <div class="apply-feedback-icon">
+                                        <mat-icon>check</mat-icon>
+                                    </div>
+                                }
+                                <button mat-stroked-button (click)="applyTopicContent()">
+                                    <span>{{ 'Apply' | translate }}</span>
+                                </button>
+                            </div>
+                        }
+                    </form>
+                }
+            </mat-card-content>
+        </mat-card>
+    }
+
+    @if (!editTopic) {
+        <os-moderation-note [listOfSpeakers]="topic?.list_of_speakers" />
+    }
+    @if (!editTopic) {
+        <div class="spacer-bottom-60">
+            @if (topic && topic.poll_ids?.length) {
+                @for (poll of topic.poll_ids | reverse; track trackById($index, poll)) {
+                    <os-topic-poll [pollId]="poll" (dialogOpened)="openDialog(poll)"></os-topic-poll>
+                }
+            }
+            @if (topic && isEVotingEnabled) {
+                <div class="create-poll-button">
+                    <button
+                        *osPerms="[permission.pollCanManage, permission.agendaItemCanManage]"
+                        create-poll-button
+                        mat-stroked-button
+                        (click)="openDialog()"
+                    >
+                        <mat-icon class="main-nav-color">add</mat-icon>
+                        <span>{{ 'New poll' | translate }}</span>
+                    </button>
+                </div>
+            }
+        </div>
+    }
+</os-detail-view>
+
+<mat-menu #topicExtraMenu="matMenu">
+    <ng-template matMenuContent>
+        <!-- PDF -->
+        <button mat-menu-item (click)="onExport()">
+            <mat-icon>archive</mat-icon>
+            <span>{{ 'Export' | translate }}</span>
+        </button>
+
+        <os-projector-button [menuItem]="true" [object]="topic" />
+        <os-speaker-button [menuItem]="true" [object]="topic" />
+        <div *osPerms="permission.agendaItemCanManage">
+            <mat-divider></mat-divider>
+            <button class="red-warning-text" mat-menu-item (click)="onDeleteButton()">
+                <mat-icon>delete</mat-icon>
+                <span>{{ 'Delete' | translate }}</span>
+            </button>
+        </div>
+        @if (isAdmin && canForward) {
+            <button mat-menu-item [disabled]="agendaItemForwardDisabled" (click)="forwardAgendaItemsToMeetings()">
+                <mat-icon>forward</mat-icon>
+                <span>{{ 'Copy to' | translate }}</span>
+            </button>
+        }
+    </ng-template>
+</mat-menu>

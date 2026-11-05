@@ -1,0 +1,18 @@
+<span [ngClass]="cssClass">
+    @if (meeting) {
+        <ng-container
+            *ngTemplateOutlet="timeTemplate; context: { startTime: meeting.start_time, endTime: meeting.end_time }"
+        ></ng-container>
+    } @else {
+        <ng-container
+            *ngTemplateOutlet="timeTemplate; context: { startTime: startTime, endTime: endTime }"
+        ></ng-container>
+    }
+</span>
+
+<ng-template #timeTemplate let-endTime="endTime" let-startTime="startTime">
+    {{
+        { start: startTime, end: endTime }
+            | localizedDateRange: 'PP' : meeting?.time_zone ?? timeZoneService.getActiveMeetingTZ()
+    }}
+</ng-template>

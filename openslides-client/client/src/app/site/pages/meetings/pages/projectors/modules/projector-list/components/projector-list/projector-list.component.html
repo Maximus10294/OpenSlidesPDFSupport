@@ -1,0 +1,52 @@
+<os-head-bar
+    [hasMainButton]="canManage"
+    [mainActionTooltip]="'New projector' | translate"
+    [nav]="true"
+    (mainEvent)="createNewProjector(projectorDialog)"
+>
+    <!-- Title -->
+    <div class="title-slot">
+        <h1 class="mock-h2" translate>Projectors</h1>
+    </div>
+</os-head-bar>
+
+<!-- Create projector dialog -->
+<ng-template #projectorDialog>
+    <h1 mat-dialog-title>
+        <span>{{ 'New projector' | translate }}</span>
+    </h1>
+
+    <form [formGroup]="createForm">
+        <mat-dialog-content>
+            <mat-form-field>
+                <mat-label>{{ 'Name' | translate }}</mat-label>
+                <input formControlName="name" matInput required />
+                <mat-error>
+                    <span>{{ 'Required' | translate }}</span>
+                </mat-error>
+            </mat-form-field>
+
+            <div>
+                <mat-checkbox formControlName="is_internal">
+                    <span>{{ 'Internal' | translate }}</span>
+                </mat-checkbox>
+            </div>
+        </mat-dialog-content>
+
+        <mat-dialog-actions>
+            <button color="accent" mat-button type="submit" [disabled]="!createForm.valid" [mat-dialog-close]="true">
+                <span>{{ 'Create' | translate }}</span>
+            </button>
+            <button mat-button type="button" [mat-dialog-close]="null">
+                <span>{{ 'Cancel' | translate }}</span>
+            </button>
+        </mat-dialog-actions>
+    </form>
+</ng-template>
+<div class="spacer-bottom-60" id="card-wrapper">
+    @for (projector of projectors | async; track $index) {
+        <div class="projector-card">
+            <os-projector-list-entry [projector]="projector"></os-projector-list-entry>
+        </div>
+    }
+</div>

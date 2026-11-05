@@ -1,0 +1,68 @@
+<os-head-bar
+    [goBack]="true"
+    [hasMainButton]="true"
+    [mainActionTooltip]="'New tag' | translate"
+    [multiSelectMode]="isMultiSelect"
+    [nav]="false"
+    (mainEvent)="openTagDialog()"
+>
+    <div class="title-slot">
+        <h1 class="mock-h2" translate>Tags</h1>
+    </div>
+</os-head-bar>
+
+<os-list
+    [addBottomSpacer]="hasInteractionState | async"
+    [filterProps]="['name']"
+    [hiddenInMobile]="['menu']"
+    [listObservableProvider]="repo"
+    [(selectedRows)]="selectedRows"
+>
+    <!-- Name column -->
+    <div *osScrollingTableCell="'name'; value as name" class="cell-slot fill">
+        <div>
+            {{ name }}
+        </div>
+    </div>
+    <!-- edit column -->
+    <div *osScrollingTableCell="'edit'; row as tag; config: { width: 45 }" class="cell-slot fill">
+        <button mat-icon-button (click)="openTagDialog(tag)">
+            <mat-icon>edit</mat-icon>
+        </button>
+    </div>
+    <!-- delete column -->
+    <div *osScrollingTableCell="'delete'; row as tag; config: { width: 45 }" class="cell-slot fill">
+        <button color="warn" mat-icon-button (click)="onDeleteButton(tag)">
+            <mat-icon>delete</mat-icon>
+        </button>
+    </div>
+</os-list>
+
+<!-- Template for dialog for quick editing -->
+<ng-template #tagDialog>
+    <h1 mat-dialog-title>
+        @if (currentTag) {
+            <span>{{ 'Edit tag' | translate }}</span>
+        }
+        @if (!currentTag) {
+            <span>{{ 'New tag' | translate }}</span>
+        }
+    </h1>
+    <mat-dialog-content class="os-form-card-mobile">
+        <form tabindex="-1" [formGroup]="tagForm" (keydown)="onKeyDown($event)">
+            <mat-form-field>
+                <mat-label>{{ 'Name' | translate }}</mat-label>
+                <input formControlName="name" matInput required type="text" />
+            </mat-form-field>
+        </form>
+    </mat-dialog-content>
+
+    <mat-dialog-actions>
+        <button color="accent" mat-button type="submit" [mat-dialog-close]="true">
+            <span>{{ 'Save' | translate }}</span>
+        </button>
+        <button mat-button type="button" [mat-dialog-close]="false">
+            <span>{{ 'Cancel' | translate }}</span>
+        </button>
+    </mat-dialog-actions>
+</ng-template>

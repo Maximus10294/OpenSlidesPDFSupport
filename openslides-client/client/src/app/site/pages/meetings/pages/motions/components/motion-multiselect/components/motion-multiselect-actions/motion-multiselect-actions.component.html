@@ -1,0 +1,122 @@
+<!-- Open selected list of speakers -->
+<button
+    mat-menu-item
+    [disabled]="!selectedMotions.length"
+    (click)="action.emit(multiselectService.bulkSetLosClosed(false, selectedMotions))"
+>
+    <mat-icon>record_voice_over</mat-icon>
+    <span>{{ 'Open list of speakers' | translate }}</span>
+</button>
+
+<!-- Close selected list of speakers -->
+<button
+    mat-menu-item
+    [disabled]="!selectedMotions.length"
+    (click)="action.emit(multiselectService.bulkSetLosClosed(true, selectedMotions))"
+>
+    <mat-icon>voice_over_off</mat-icon>
+    <span>{{ 'Close list of speakers' | translate }}</span>
+</button>
+
+<mat-divider />
+
+<button
+    mat-menu-item
+    [disabled]="!selectedMotions.length"
+    (click)="action.emit(multiselectService.bulkSetFavorite(selectedMotions))"
+>
+    <mat-icon>star</mat-icon>
+    <span>{{ 'Set favorite' | translate }} ...</span>
+</button>
+<button
+    mat-menu-item
+    [disabled]="!selectedMotions.length"
+    (click)="action.emit(multiselectService.setStateOfMultiple(selectedMotions))"
+>
+    <mat-icon>label</mat-icon>
+    <span>{{ 'Set status' | translate }} ...</span>
+</button>
+@if (recommendationEnabled) {
+    <button
+        mat-menu-item
+        [disabled]="!selectedMotions.length"
+        (click)="action.emit(multiselectService.setRecommendation(selectedMotions))"
+    >
+        <mat-icon>report</mat-icon>
+        <!-- TODO: better icon -->
+        <span>{{ 'Set recommendation' | translate }} ...</span>
+    </button>
+}
+@if (categories.length) {
+    <button
+        mat-menu-item
+        [disabled]="!selectedMotions.length"
+        (click)="action.emit(multiselectService.setCategory(selectedMotions))"
+    >
+        <mat-icon>category</mat-icon>
+        <span>{{ 'Set category' | translate }} ...</span>
+    </button>
+}
+@if (motionBlocks.length) {
+    <button
+        mat-menu-item
+        [disabled]="!selectedMotions.length"
+        (click)="action.emit(multiselectService.setMotionBlock(selectedMotions))"
+    >
+        <mat-icon>widgets</mat-icon>
+        <span>{{ 'Set motion block' | translate }} ...</span>
+    </button>
+}
+@if (tags.length) {
+    <button
+        mat-menu-item
+        [disabled]="!selectedMotions.length"
+        (click)="action.emit(multiselectService.changeTags(selectedMotions))"
+    >
+        <mat-icon>local_offer</mat-icon>
+        <span>{{ 'Set tags' | translate }} ...</span>
+    </button>
+}
+<button
+    mat-menu-item
+    [disabled]="!selectedMotions.length"
+    (click)="action.emit(multiselectService.setWorkflow(selectedMotions))"
+>
+    <mat-icon>build</mat-icon>
+    <span>{{ 'Set workflow' | translate }} ...</span>
+</button>
+<button
+    mat-menu-item
+    [disabled]="!selectedMotions.length"
+    (click)="action.emit(multiselectService.changeSubmitters(selectedMotions))"
+>
+    <mat-icon>person_add</mat-icon>
+    <span>{{ 'Set submitters' | translate }} ...</span>
+</button>
+
+<ng-content />
+<ng-container *osPerms="permission.agendaItemCanManage">
+    <!-- Add to projector queue -->
+    <os-projector-button
+        [disabled]="!selectedMotions.length"
+        [hideMainButton]="true"
+        [menuItem]="true"
+        [object]="addToProjectorQueue()"
+    ></os-projector-button>
+</ng-container>
+<ng-container *osPerms="permission.motionCanManage">
+    <button mat-menu-item [disabled]="!selectedMotions.length" (click)="openExportDialog()">
+        <mat-icon>archive</mat-icon>
+        <span>{{ 'Export selected motions' | translate }} ...</span>
+    </button>
+    <mat-divider />
+    <button
+        class="red-warning-text"
+        mat-menu-item
+        [disabled]="!selectedMotions.length"
+        (click)="action.emit(multiselectService.delete(selectedMotions))"
+    >
+        <mat-icon>delete</mat-icon>
+        <span>{{ 'Delete' | translate }}</span>
+    </button>
+</ng-container>

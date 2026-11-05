@@ -1,0 +1,59 @@
+.settings-field-wrapper {
+    width: 100%;
+    display: flex;
+
+    .form-item {
+        flex: 2;
+    }
+
+    /* Full width form fields */
+    .mat-mdc-form-field {
+        width: 100%;
+    }
+
+    .datetimepicker-container {
+        margin-left: -20px;
+        display: flex;
+
+        .mat-mdc-form-field {
+            flex: 1;
+            box-sizing: border-box;
+            padding-left: 20px;
+
+            .suffix-wrapper {
+                display: flex;
+                align-items: center;
+
+                .mat-datepicker-toggle {
+                    padding-left: 4px;
+                    padding-right: 4px;
+
+                    .mat-datepicker-toggle-default-icon {
+                        width: 20px;
+                        margin-bottom: 10px;
+                    }
+                }
+
+                .ngx-material-timepicker-toggle {
+                    width: 28px;
+                }
+            }
+        }
+    }
+
+    /* limit the color bar of color inputs */
+    input[type='color'] {
+        max-width: 100px;
+    }
+
+    /* Spacing between config entries */
+    .settings-form-group {
+        margin-bottom: 16px;
+        &.checkbox-setting {
+            margin-bottom: 8px;
+            .settings-form-group {
+                margin-bottom: 8px;
+            }
+        }
+    }
+}

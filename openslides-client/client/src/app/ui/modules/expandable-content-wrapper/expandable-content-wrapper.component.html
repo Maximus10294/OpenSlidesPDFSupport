@@ -1,0 +1,23 @@
+<div class="expandable-content-wrapper">
+    <div
+        #contentBox
+        class="content"
+        osResized
+        [ngClass]="[
+            isCollapsed ? 'collapsed' : '',
+            isCollapsed && biggerHeight ? 'collapsed-delegations' : '',
+            isCollapsed && !biggerHeight ? 'collapsed-card-content' : ''
+        ]"
+        (osResizedHeight)="onResizedHeight($event)"
+    >
+        <ng-content></ng-content>
+    </div>
+    <!-- Expanding control -->
+    @if (canExpand && !disableExpandControl) {
+        <div class="small show-entire-text" [ngClass]="[biggerHeight ? 'margin-top-8' : '']">
+            <a tabindex="0" (click)="toggleExpansion()" (keydown.enter)="toggleExpansion()">
+                {{ isExpanded ? ('Hide more text' | translate) : ('Show full text' | translate) }}
+            </a>
+        </div>
+    }
+</div>

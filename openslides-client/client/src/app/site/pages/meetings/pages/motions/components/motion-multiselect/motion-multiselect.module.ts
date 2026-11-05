@@ -1,0 +1,35 @@
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { OpenSlidesTranslationModule } from 'src/app/site/modules/translations';
+import { DirectivesModule } from 'src/app/ui/directives';
+import { ChoiceDialogComponent } from 'src/app/ui/modules/choice-dialog';
+
+import { ProjectableListModule } from '../../../../modules/meetings-component-collector/projectable-list/projectable-list.module';
+import { ProjectorButtonModule } from '../../../../modules/meetings-component-collector/projector-button/projector-button.module';
+import { AgendaItemCommonServiceModule } from '../../../agenda/services/agenda-item-common-service.module';
+import { MotionMultiselectActionsComponent } from './components/motion-multiselect-actions/motion-multiselect-actions.component';
+import { MotionMultiselectServiceModule } from './services/motion-multiselect-service.module';
+
+const DECLARATIONS = [MotionMultiselectActionsComponent];
+
+@NgModule({
+    declarations: DECLARATIONS,
+    exports: DECLARATIONS,
+    imports: [
+        CommonModule,
+        MotionMultiselectServiceModule,
+        MatIconModule,
+        MatDividerModule,
+        MatMenuModule,
+        ChoiceDialogComponent,
+        DirectivesModule,
+        ProjectableListModule,
+        ProjectorButtonModule,
+        OpenSlidesTranslationModule.forChild(),
+        AgendaItemCommonServiceModule
+    ]
+})
+export class MotionMultiselectModule {}

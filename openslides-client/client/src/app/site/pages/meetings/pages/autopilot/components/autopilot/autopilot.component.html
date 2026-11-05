@@ -1,0 +1,212 @@
+<os-head-bar>
+    <div class="title-slot">
+        <h1 class="mock-h2">
+            {{ 'Autopilot' | translate }}
+            @if ((title || '').toLowerCase() === 'axolotl') {
+                ⚞(⚬___⚬)⚟
+            }
+        </h1>
+    </div>
+
+    <!-- Menu -->
+    <ng-container class="menu-slot">
+        <button
+            mat-icon-button
+            type="button"
+            [matTooltip]="'Customize autopilot' | translate"
+            (click)="customizeAutopilot()"
+        >
+            <mat-icon
+                matBadgeColor="warn"
+                matBadgeSize="small"
+                [matBadge]="numDisabledElements"
+                [matBadgeHidden]="numDisabledElements < 1"
+            >
+                settings
+            </mat-icon>
+        </button>
+    </ng-container>
+</os-head-bar>
+
+<div
+    class="content-container"
+    [ngClass]="{
+        'split-autopilot':
+            disabledContentElements['speaking-times'] !== true &&
+                structureLevelCountdownEnabled &&
+                listOfSpeakers &&
+                showRightCol | async
+    }"
+>
+    <div class="col-wrapper">
+        <div class="col-main">
+            <!-- Title Card -->
+            @if (!!title && disabledContentElements['title'] !== true) {
+                <mat-card class="os-card">
+                    <mat-card-content>
+                        <a
+                            [routerLink]="viewModelUrl || null"
+                            [state]="{ back: 'true' }"
+                            [target]="lowerProjectionTarget"
+                        >
+                            <h1>
+                                {{ title }}
+                            </h1>
+                        </a>
+                    </mat-card-content>
+                </mat-card>
+            }
+
+            <!-- List of speakers -->
+            <os-list-of-speakers-content
+                *osPerms="
+                    [permission.listOfSpeakersCanSee, permission.listOfSpeakersCanBeSpeaker];
+                    and: !!listOfSpeakers && disabledContentElements['list-of-speakers'] !== true
+                "
+                [listOfSpeakers]="listOfSpeakers!"
+                (canReaddLastSpeakerEvent)="canReaddLastSpeaker = $event"
+            >
+                <ng-template osListOfSpeakersContentTitle>
+                    <div class="line-and-icon subtitle-text">
+                        @if (closUrl) {
+                            <a [routerLink]="closUrl">
+                                <h2 class="accessibility-h2 accessibility-h2-1">
+                                    {{ 'List of speakers' | translate }}
+                                </h2>
+                            </a>
+                        }
+                        @if (!closUrl) {
+                            <h2 class="accessibility-h2 accessibility-h2-1">
+                                {{ 'List of speakers' | translate }}
+                            </h2>
+                        }
+
+                        <ng-container *osPerms="permission.listOfSpeakersCanManage; complement: true">
+                            @if (isLosClosed) {
+                                <mat-icon
+                                    matTooltip="{{ 'The list of speakers is closed.' | translate }}"
+                                    matTooltipPosition="above"
+                                >
+                                    lock
+                                </mat-icon>
+                            }
+                        </ng-container>
+
+                        <ng-container *osPerms="permission.listOfSpeakersCanManage">
+                            <button class="title-action" mat-icon-button (click)="toggleListOfSpeakersOpen()">
+                                @if (isLosClosed) {
+                                    <mat-icon
+                                        matTooltip="{{ 'Open list of speakers' | translate }}"
+                                        matTooltipPosition="above"
+                                    >
+                                        lock
+                                    </mat-icon>
+                                }
+                                @if (!isLosClosed) {
+                                    <mat-icon
+                                        matTooltip="{{ 'Close list of speakers' | translate }}"
+                                        matTooltipPosition="above"
+                                    >
+                                        lock_open
+                                    </mat-icon>
+                                }
+                            </button>
+
+                            <button
+                                class="title-action"
+                                mat-icon-button
+                                matTooltip="{{ 'Re-add last speaker' | translate }}"
+                                matTooltipPosition="above"
+                                [disabled]="!canReaddLastSpeaker"
+                                (click)="readdLastSpeaker()"
+                            >
+                                <mat-icon>undo</mat-icon>
+                            </button>
+                        </ng-container>
+                    </div>
+                </ng-template>
+            </os-list-of-speakers-content>
+
+            <ng-container *osPerms="permission.listOfSpeakersCanSee">
+                @if (
+                    structureLevelCountdownEnabled &&
+                    listOfSpeakers &&
+                    (showRightCol | async) === false &&
+                    disabledContentElements['speaking-times'] !== true
+                ) {
+                    <div>
+                        <ng-container [ngTemplateOutlet]="speakingTimes"></ng-container>
+                    </div>
+                }
+            </ng-container>
+
+            <!-- Moderator Note-->
+            @if (hasCurrentProjection && !!listOfSpeakers && disabledContentElements['moderation-note'] !== true) {
+                <div>
+                    <os-moderation-note
+                        [listOfSpeakers]="listOfSpeakers"
+                        [showModerationNotesExport]="false"
+                    ></os-moderation-note>
+                </div>
+            }
+
+            <!-- Poll-Collection -->
+            @if (
+                showPollCollection &&
+                (disabledContentElements['poll-finished'] !== true || disabledContentElements['poll-running'] !== true)
+            ) {
+                <os-poll-collection
+                    [currentProjection]="projectedViewModel"
+                    [disableFinished]="disabledContentElements['poll-finished'] === true || isAgendaListProjection"
+                    [disableRunning]="disabledContentElements['poll-running'] === true"
+                    [displayInAutopilot]="true"
+                ></os-poll-collection>
+            }
+
+            <!-- Projector -->
+            @if (disabledContentElements['projector'] !== true) {
+                <mat-card class="os-card spacer-bottom-60">
+                    <mat-card-content>
+                        <a [routerLink]="projectorUrl" [state]="{ back: 'true' }" [target]="projectionTarget">
+                            <h2 class="accessibility-h2 accessibility-h2-3 subtitle-text">
+                                {{ projectorTitle }}
+                            </h2>
+                        </a>
+                        <a
+                            [routerLink]="viewModelUrl || null"
+                            [state]="{ back: 'true' }"
+                            [target]="lowerProjectionTarget"
+                        >
+                            <div class="projector">
+                                @if (projector) {
+                                    <os-projector [projector]="projector"></os-projector>
+                                }
+                            </div>
+                        </a>
+                    </mat-card-content>
+                </mat-card>
+            }
+        </div>
+
+        <ng-container *osPerms="permission.listOfSpeakersCanSee">
+            @if (
+                disabledContentElements['speaking-times'] !== true &&
+                    structureLevelCountdownEnabled &&
+                    listOfSpeakers &&
+                    showRightCol | async
+            ) {
+                <div class="col-right">
+                    <ng-container [ngTemplateOutlet]="speakingTimes"></ng-container>
+                </div>
+            }
+        </ng-container>
+    </div>
+</div>
+
+<ng-template #speakingTimes>
+    <mat-card class="os-card spacer-bottom-60">
+        <mat-card-content>
+            <os-speaking-times [listOfSpeakers]="listOfSpeakers" [showProjectionMenu]="false" />
+        </mat-card-content>
+    </mat-card>
+</ng-template>

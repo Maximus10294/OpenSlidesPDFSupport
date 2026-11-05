@@ -1,0 +1,5 @@
+@if (isStable | async) {
+    <div class="particle-wrapper" (osResized)="updateParticleContainer($event)">
+        <ngx-particles id="particles" [options]="options" (particlesLoaded)="particlesLoaded($event)"></ngx-particles>
+    </div>
+}

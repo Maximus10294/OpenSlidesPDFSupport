@@ -1,0 +1,22 @@
+#wrapper {
+    font-size: 14px;
+}
+h3.accent {
+    margin-bottom: 20px;
+    &:first-child {
+        margin-top: 0;
+    }
+    &:not(:first-child) {
+        margin-top: 30px;
+    }
+}
+
+.settings-help-container {
+    margin-bottom: 37px;
+    display: flex;
+    align-items: center;
+
+    .settings-help-text {
+        margin-right: 10px;
+    }
+}

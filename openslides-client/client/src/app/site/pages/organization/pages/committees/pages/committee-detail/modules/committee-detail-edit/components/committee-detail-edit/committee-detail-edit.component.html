@@ -1,0 +1,100 @@
+<os-head-bar
+    [editMode]="true"
+    [isSaveButtonEnabled]="committeeForm.valid"
+    [nav]="false"
+    [saveAction]="getSaveAction()"
+    (cancelEditEvent)="onCancel()"
+>
+    <!-- Title -->
+    <div class="title-slot">
+        <h1 class="mock-h2">
+            @if (isCreateView) {
+                {{ addCommitteeLabel | translate }}
+            } @else {
+                {{ editCommitteeLabel | translate }}
+            }
+        </h1>
+    </div>
+</os-head-bar>
+
+<mat-card class="os-card">
+    <mat-card-content>
+        @if (committeeForm) {
+            <form class="committee-form" [formGroup]="committeeForm" (ngSubmit)="onSubmit()">
+                <mat-form-field>
+                    <mat-label>{{ 'Title' | translate }}</mat-label>
+                    <input data-cy="committeeName" formControlName="name" matInput osAutofocus required />
+                    <mat-error>{{ 'The title is required' | translate }}</mat-error>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>{{ 'Description' | translate }}</mat-label>
+                    <input data-cy="committeeDescription" formControlName="description" matInput />
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>{{ 'Tags' | translate }}</mat-label>
+                    <os-repo-search-selector
+                        formControlName="organization_tag_ids"
+                        [multiple]="true"
+                        [repo]="orgaTagRepo"
+                        (clickNotFound)="onOrgaTagNotFound($event)"
+                    >
+                        <ng-template osNotFoundDescription>
+                            {{ 'New tag' | translate }}
+                        </ng-template>
+                    </os-repo-search-selector>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>{{ 'Committee admin' | translate }}</mat-label>
+                    <os-account-search-selector
+                        formControlName="manager_ids"
+                        [committeeId]="committeeId"
+                    ></os-account-search-selector>
+                </mat-form-field>
+                @if (!restrictForwarding) {
+                    <mat-form-field>
+                        <mat-label>{{ 'Can forward motions to committee' | translate }}</mat-label>
+                        <os-repo-search-selector
+                            formControlName="forward_to_committee_ids"
+                            [disableOptionWhenFn]="isNotCommitteeAdminFor"
+                            [multiple]="true"
+                            [repo]="committeeRepo"
+                            [showChips]="false"
+                            [sortService]="committeeSortService"
+                            (selectionChanged)="onForwardingSelectionChanged($event)"
+                        ></os-repo-search-selector>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>{{ 'Can receive motions from committee' | translate }}</mat-label>
+                        <os-repo-search-selector
+                            formControlName="receive_forwardings_from_committee_ids"
+                            [disableOptionWhenFn]="getDisableOptionWhenFn"
+                            [multiple]="true"
+                            [repo]="committeeRepo"
+                            [showChips]="false"
+                            [sortService]="committeeSortService"
+                            [tooltipFn]="getTooltipFn()"
+                        ></os-repo-search-selector>
+                    </mat-form-field>
+                }
+                <mat-form-field>
+                    <mat-label>{{ 'External ID' | translate }}</mat-label>
+                    <input formControlName="external_id" matInput />
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>{{ 'Parent committee' | translate }}</mat-label>
+                    <os-repo-search-selector
+                        formControlName="parent_id"
+                        [disableOptionWhenFn]="getDisableOptionForCommitteeParentFn()"
+                        [includeNone]="isOrgaManager && isCreateView"
+                        [multiple]="false"
+                        [repo]="committeeRepo"
+                        [required]="!isOrgaManager && isCreateView"
+                        [showChips]="false"
+                        [sortService]="committeeSortService"
+                        [tooltipFn]="getTooltipFn()"
+                    ></os-repo-search-selector>
+                </mat-form-field>
+            </form>
+        }
+    </mat-card-content>
+</mat-card>

@@ -1,0 +1,231 @@
+<os-detail-view [collection]="COLLECTION" (idFound)="onIdFound($event)">
+    <os-head-bar [nav]="false">
+        <!-- Title -->
+        <div class="title-slot">
+            @if (block) {
+                <os-icon-container
+                    icon="check"
+                    size="large"
+                    [iconTooltip]="'Finished' | translate"
+                    [noWrap]="true"
+                    [showIcon]="block.isFinished"
+                >
+                    <os-icon-container
+                        icon="lock"
+                        size="large"
+                        [iconTooltip]="'Internal' | translate"
+                        [noWrap]="true"
+                        [showIcon]="block.internal"
+                    >
+                        <os-projectable-title titleStyle="h1" [mockH2]="true" [model]="block"></os-projectable-title>
+                    </os-icon-container>
+                </os-icon-container>
+            }
+        </div>
+
+        <!-- Menu -->
+        <ng-container class="menu-slot">
+            <button mat-icon-button type="button" [matMenuTriggerFor]="motionBlockMenu">
+                <mat-icon>more_vert</mat-icon>
+            </button>
+        </ng-container>
+
+        <!-- Extra Controls -->
+        @if (!vp.isMobile) {
+            <div class="extra-controls-slot">
+                <button
+                    *osPerms="[permission.motionCanManage, permission.motionCanManageMetadata]"
+                    mat-button
+                    [disabled]="isFollowButtonDisabledObservable() | async"
+                    (click)="onFollowRecButton()"
+                >
+                    <os-icon-container class="follow-all-icon" icon="done_all">
+                        <div>{{ 'Follow recommendations for all motions' | translate }}</div>
+                    </os-icon-container>
+                </button>
+            </div>
+        }
+    </os-head-bar>
+
+    <os-projectable-list
+        [filterProps]="filterProps"
+        [filterService]="filterService"
+        [hiddenInMobile]="['remove']"
+        [listObservableProvider]="motionRepo"
+        [restricted]="restrictedColumns"
+    >
+        <!-- Title column -->
+        <div *osScrollingTableCell="'title'; row as motion; rowContext as rowContext" class="cell-slot fill">
+            @if (!isMultiSelect) {
+                <a
+                    class="detail-link"
+                    [attr.aria-label]="ariaLabel(motion)"
+                    [routerLink]="motion.getDetailStateUrl()"
+                    [state]="{ back: 'true' }"
+                ></a>
+            }
+            <div class="column-title innerTable overflow-hidden">
+                <div class="title-line ellipsis-overflow">
+                    <!-- Is Favorite -->
+                    @if (motion.isFavorite) {
+                        <span class="favorite-star">
+                            <mat-icon inline>star</mat-icon>
+                        </span>
+                    }
+
+                    <!-- Has File -->
+                    @if (motion.hasAttachments()) {
+                        <span class="icon-prefix">
+                            <mat-icon>attach_file</mat-icon>
+                        </span>
+                    }
+
+                    <!-- The title -->
+                    <span class="ellipsis-overflow">
+                        @if (motion.number) {
+                            <span>
+                                {{ motion.number }}
+                                <span>&middot;</span>
+                            </span>
+                        }
+                        {{ motion.title }}
+                    </span>
+                </div>
+
+                <!-- Submitters -->
+                <div class="submitters-line ellipsis-overflow">
+                    @if (motion.submitters.length) {
+                        <span>
+                            <span>{{ 'by' | translate }}</span>
+                            {{ motion.submitters }}
+                        </span>
+                    }
+                    @if (showSequential) {
+                        <span>
+                            @if (motion.submitters.length) {
+                                <span>&middot;&thinsp;</span>
+                            }
+                            <span>{{ 'Sequential number' | translate }}</span>
+                            {{ motion.sequential_number }}
+                        </span>
+                    }
+                </div>
+
+                <!-- Workflow state -->
+                <div class="ellipsis-overflow white">
+                    @if (motion.state) {
+                        <mat-basic-chip [disabled]="true" [ngClass]="motion.stateCssColor">
+                            {{ getStateLabel(motion) }}
+                        </mat-basic-chip>
+                    }
+                </div>
+
+                <!-- Recommendation column -->
+                <div class="ellipsis-overflow white spacer-top-3">
+                    @if (!!motion.recommendation) {
+                        <mat-basic-chip class="bluegrey" [disabled]="true">
+                            {{ getRecommendationLabel(motion) }}
+                        </mat-basic-chip>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Remove from block column -->
+        <div *osScrollingTableCell="'remove'; row as motion; config: { width: 60 }" class="cell-slot fill">
+            <button
+                color="warn"
+                mat-icon-button
+                matTooltip="{{ 'Remove from motion block' | translate }}"
+                type="button"
+                (click)="onRemoveMotionButton(motion)"
+            >
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+
+        <!-- Menu -->
+        <div
+            *osScrollingTableCell="'menu'; row as motion; config: { width: 40, position: END_POSITION }"
+            class="cell-slot fill"
+        >
+            <button
+                mat-icon-button
+                [disabled]="isMultiSelect"
+                [matMenuTriggerData]="{ motion: motion }"
+                [matMenuTriggerFor]="singleItemMenu"
+                (click)="$event.stopPropagation()"
+            >
+                <mat-icon>more_vert</mat-icon>
+            </button>
+        </div>
+    </os-projectable-list>
+</os-detail-view>
+
+<!-- Menu for mobile entries -->
+<mat-menu #singleItemMenu="matMenu">
+    <ng-template let-motion="motion" matMenuContent>
+        <os-projector-button [menuItem]="true" [object]="motion" />
+        <os-speaker-button [menuItem]="true" [object]="motion" />
+        <button
+            *osPerms="[permission.motionCanManage, permission.motionCanManageMetadata]"
+            class="red-warning-text"
+            mat-menu-item
+            (click)="onRemoveMotionButton(motion)"
+        >
+            <mat-icon>close</mat-icon>
+            <span>{{ 'Remove from motion block' | translate }}</span>
+        </button>
+    </ng-template>
+</mat-menu>
+
+<!-- The menu content -->
+<mat-menu #motionBlockMenu="matMenu">
+    @if (vp.isMobile) {
+        <div>
+            <button
+                *osPerms="[permission.motionCanManage, permission.motionCanManageMetadata]"
+                mat-menu-item
+                [disabled]="isFollowButtonDisabledObservable() | async"
+                (click)="onFollowRecButton()"
+            >
+                <mat-icon>done_all</mat-icon>
+                <span>{{ 'Follow recommendations for all motions' | translate }}</span>
+            </button>
+        </div>
+    }
+
+    <os-speaker-button [menuItem]="true" [object]="block" />
+
+    @if (block) {
+        <os-projector-button [menuItem]="true" [object]="block" />
+    }
+
+    <div *osPerms="permission.agendaItemCanManage">
+        @if (block && !block.agenda_item_id) {
+            <button mat-menu-item (click)="addToAgenda()">
+                <mat-icon>add</mat-icon>
+                <span>{{ 'Add to agenda' | translate }}</span>
+            </button>
+        }
+        @if (block && block.agenda_item_id) {
+            <button mat-menu-item (click)="removeFromAgenda()">
+                <mat-icon>remove</mat-icon>
+                <span>{{ 'Remove from agenda' | translate }}</span>
+            </button>
+        }
+    </div>
+
+    <div *osPerms="[permission.motionCanManage]">
+        <button mat-menu-item (click)="toggleEditMode()">
+            <mat-icon>edit</mat-icon>
+            <span>{{ 'Edit' | translate }}</span>
+        </button>
+        <mat-divider></mat-divider>
+
+        <button class="red-warning-text" mat-menu-item (click)="onDeleteBlockButton()">
+            <mat-icon>delete</mat-icon>
+            <span>{{ 'Delete' | translate }}</span>
+        </button>
+    </div>
+</mat-menu>

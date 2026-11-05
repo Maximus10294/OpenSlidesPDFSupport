@@ -1,0 +1,396 @@
+// Material theming import
+@use '@angular/material' as mat;
+@use "sass:map";
+@use "sass:color";
+
+/**
+ *  Mixin-style to style global classes and tags with theme-related colors.
+ */
+@mixin os-component-themes($theme) {
+    $primary: map.get($theme, primary);
+    $accent: map.get($theme, accent);
+    $warn: map.get($theme, warn);
+    $foreground: map.get($theme, foreground);
+    $background: map.get($theme, background);
+
+    $is-dark-theme: map.get($theme, is-dark);
+
+    $percent: -0.04;
+    @if $is-dark-theme {
+        $percent: 0.04;
+    }
+
+    h1,
+    h3.accent {
+        color: mat.m2-get-color-from-palette($primary);
+        @if $is-dark-theme {
+            color: mat.m2-get-color-from-palette($accent);
+        }
+    }
+
+    a {
+        color: mat.m2-get-color-from-palette($primary);
+        @if $is-dark-theme {
+            color: mat.m2-get-color-from-palette($accent);
+        }
+    }
+
+    .underlined-links a {
+        text-decoration: solid underline mat.m2-get-color-from-palette($primary) 0.15em;
+        @if $is-dark-theme {
+            text-decoration: solid underline mat.m2-get-color-from-palette($accent) 0.15em;
+        }
+
+        &:hover {
+            text-decoration: solid underline mat.m2-get-color-from-palette($primary) 0.175em;
+            @if $is-dark-theme {
+                text-decoration: solid underline mat.m2-get-color-from-palette($accent) 0.175em;
+            }
+        }
+
+        & {
+            a.mat-mdc-button-base {
+                text-decoration: inherit;
+            }
+        }
+    }
+
+    .select-speaker-button-design {
+        color: mat.m2-get-color-from-palette($primary);
+        @if $is-dark-theme {
+            color: mat.m2-get-color-from-palette($accent);
+        }
+    }
+
+    .accentuated-background,
+    .accentuated-background button {
+        background-color: color.adjust(mat.m2-get-color-from-palette($background, background), $hue: $percent);
+    }
+
+    mat-card {
+        .accentuated-background,
+        .accentuated-background button {
+            background-color: color.adjust(mat.m2-get-color-from-palette($background, card), $hue: $percent);
+        }
+    }
+
+    .anchor-button {
+        color: mat.m2-get-color-from-palette($foreground, text) !important;
+    }
+
+    .accent,
+    .accent-text {
+        color: mat.m2-get-color-from-palette($accent);
+    }
+
+    .primary-accent-by-theme {
+        color: mat.m2-get-color-from-palette($primary);
+        @if $is-dark-theme {
+            color: mat.m2-get-color-from-palette($accent);
+        }
+    }
+
+    /**
+     * normal current mat bg color with primary text color.
+     * important is required to overwrite materials default
+     * button color
+     */
+    .custom-table-header,
+    .background-default {
+        background: mat.m2-get-color-from-palette($background, background) !important;
+    }
+
+    .disabled {
+        color: mat.m2-get-color-from-palette($foreground, disabled-button);
+    }
+
+    .fake-disabled {
+        background: mat.m2-get-color-from-palette($background, unselected-chip) !important;
+        color: mat.m2-get-color-from-palette($foreground, disabled-button);
+        opacity: 1 !important;
+        .mat-icon {
+            color: color.adjust(mat.m2-get-color-from-palette($foreground, disabled-button), $alpha: 0.28) !important;
+            svg path {
+                fill: mat.m2-get-color-from-palette(
+                    $foreground,
+                    disabled-button
+                        color.adjust(mat.m2-get-color-from-palette($foreground, disabled-button), $alpha: 0.28)
+                ) !important;
+            }
+        }
+    }
+
+    .error,
+    .warn {
+        color: mat.m2-get-color-from-palette($warn);
+    }
+
+    .outline-border-bottom {
+        border-bottom: 1px solid mat.m2-get-color-from-palette(mat.$m2-grey-palette, 300);
+    }
+
+    /* motion list/detail view */
+    .mat-mdc-chip-list.user .mat-chip {
+        color: mat.m2-get-color-from-palette($foreground, text);
+        background: mat.m2-get-color-from-palette($background, card);
+        border-color: mat.m2-get-color-from-palette($background, selected-button);
+    }
+
+    .os-amount-chip {
+        background: mat.m2-get-color-from-palette($background, selected-button);
+        color: mat.m2-get-color-from-palette($foreground, text);
+    }
+
+    .subtitle-text {
+        color: mat.m2-get-color-from-palette($primary);
+        @if $is-dark-theme {
+            color: mat.m2-get-color-from-palette($accent);
+        }
+    }
+
+    .main-nav-color {
+        color: mat.m2-get-color-from-palette($foreground, secondary-text);
+    }
+
+    .submitters-line {
+        color: mat.m2-get-color-from-palette($foreground, secondary-text);
+    }
+
+    .subtitle {
+        color: mat.m2-get-color-from-palette($foreground, secondary-text);
+    }
+
+    .user-subtitle {
+        color: mat.m2-get-color-from-palette($foreground, secondary-text);
+    }
+
+    .mat-mdc-card-header {
+        background-color: mat.m2-get-color-from-palette($background, app-bar);
+    }
+
+    /* drag & drop views */
+    .node-content-wrapper {
+        background-color: mat.m2-get-color-from-palette($background, app-bar);
+    }
+
+    /* projector components */
+    .backgroundColorAccent {
+        background-color: mat.m2-get-color-from-palette($accent);
+        &,
+        .mdc-list-item__primary-text {
+            color: mat.m2-get-color-from-palette($accent, default-contrast) !important;
+        }
+    }
+
+    .backgroundColorSelected {
+        background-color: rgba(0, 0, 0, 0.155);
+        color: mat.m2-get-color-from-palette($foreground, text) !important;
+    }
+
+    .backgroundColorLight {
+        background-color: mat.m2-get-color-from-palette($background, hover);
+        color: mat.m2-get-color-from-palette($foreground, text) !important;
+    }
+
+    .icon {
+        color: mat.m2-get-color-from-palette($foreground, icon);
+    }
+
+    /** Custom themes for NGrid. Could be an own file if it gets more */
+    .pbl-ngrid-container {
+        background: mat.m2-get-color-from-palette($background, card);
+    }
+
+    .pbl-ngrid-no-data {
+        color: mat.m2-get-color-from-palette($foreground, secondary-text);
+    }
+
+    /**
+     * CLEANUP:
+     * whole theme-related stylesheets can be replaced using classes like this one
+     */
+    .outlined {
+        background: mat.m2-get-color-from-palette($background, background);
+    }
+
+    .outlined-hover {
+        @extend .outlined;
+        &:hover {
+            background-color: mat.m2-get-color-from-palette($background, selected-button);
+        }
+    }
+
+    .outlined-border {
+        @extend .outlined;
+        border: 1px solid mat.m2-get-color-from-palette($background, selected-button);
+    }
+
+    .background-default {
+        background: mat.m2-get-color-from-palette($background, background);
+        color: mat.m2-get-color-from-palette($foreground, text);
+    }
+
+    .background-hover {
+        &:hover {
+            background-color: mat.m2-get-color-from-palette($background, background);
+        }
+    }
+
+    .background-primary {
+        background: mat.m2-get-color-from-palette($primary) !important;
+        color: mat.m2-get-color-from-palette($primary, default-contrast) !important;
+    }
+
+    .background-primary-darker {
+        background: mat.m2-get-color-from-palette($primary, 700);
+        color: mat.m2-get-color-from-palette($primary, default-contrast) !important;
+    }
+
+    .background-primary-darkest {
+        background: mat.m2-get-color-from-palette($primary, 900);
+        color: mat.m2-get-color-from-palette($primary, default-contrast) !important;
+    }
+
+    .background-accent {
+        background: mat.m2-get-color-from-palette($accent) !important;
+        color: mat.m2-get-color-from-palette($accent, default-contrast) !important;
+
+        a {
+            color: mat.m2-get-color-from-palette($accent, default-contrast) !important;
+        }
+    }
+
+    .background-warn {
+        background: mat.m2-get-color-from-palette($warn) !important;
+    }
+
+    .background-card {
+        background: mat.m2-get-color-from-palette($background, card);
+        color: mat.m2-get-color-from-palette($foreground, text);
+    }
+
+    .collapsed-card-content {
+        &::after {
+            background: linear-gradient(rgba(255, 255, 255, 0), mat.m2-get-color-from-palette($background, card));
+        }
+    }
+
+    .background-selected {
+        background-color: mat.m2-get-color-from-palette($background, selected-button);
+    }
+
+    .foreground-active {
+        $color: mat.m2-get-color-from-palette($primary);
+        @if $is-dark-theme {
+            $color: mat.m2-get-color-from-palette($accent);
+        }
+        color: $color !important;
+        * {
+            color: $color !important;
+        }
+    }
+
+    .foreground-primary {
+        color: mat.m2-get-color-from-palette($primary);
+    }
+
+    .foreground-primary-contrast {
+        color: mat.m2-get-color-from-palette($primary, default-contrast);
+    }
+
+    .foreground-accent {
+        color: mat.m2-get-color-from-palette($accent);
+    }
+
+    .foreground-accent-contrast {
+        color: mat.m2-get-color-from-palette($accent, default-contrast);
+    }
+
+    .foreground-warn {
+        $color: mat.m2-get-color-from-palette($warn);
+        color: $color !important;
+        * {
+            color: $color !important;
+        }
+    }
+
+    .foreground-icon {
+        mat-icon {
+            color: mat.m2-get-color-from-palette($foreground, icon);
+        }
+        * {
+            color: mat.m2-get-color-from-palette($foreground, text);
+        }
+        &.active {
+            $color: mat.m2-get-color-from-palette($primary);
+            @if $is-dark-theme {
+                $color: mat.m2-get-color-from-palette($accent);
+            }
+            color: $color;
+            * {
+                color: $color;
+            }
+        }
+    }
+
+    .text {
+        color: mat.m2-get-color-from-palette($foreground, text);
+    }
+
+    mat-hint,
+    .hint {
+        color: mat.m2-get-color-from-palette($foreground, secondary-text);
+    }
+
+    .svg-primary {
+        svg path {
+            fill: mat.m2-get-color-from-palette($primary) !important;
+        }
+    }
+
+    .light-gray-by-theme {
+        color: rgba(0, 0, 0, 0.65);
+        @if $is-dark-theme {
+            color: white;
+        }
+    }
+
+    .divider {
+        $divider-color: 1px solid mat.m2-get-color-from-palette($foreground, divider);
+        &-bottom {
+            border-bottom: $divider-color;
+        }
+        &-left {
+            border-left: $divider-color;
+        }
+        &-right {
+            border-right: $divider-color;
+        }
+        &-top {
+            border-top: $divider-color;
+        }
+    }
+
+    .assignment-results {
+        .row:not(:last-child) {
+            border-bottom: 1px solid mat.m2-get-color-from-palette($background, focused-button);
+        }
+        .cell {
+            &:focus {
+                outline: rgba(0, 0, 0, 0.55) solid 3px;
+                background-color: rgba(0, 0, 0, 0.05);
+                @if $is-dark-theme {
+                    outline: rgba(255, 255, 255, 0.55) solid 3px;
+                    background-color: rgba(255, 255, 255, 0.15);
+                }
+            }
+        }
+    }
+
+    .sidenav-background {
+        background: white;
+        @if $is-dark-theme {
+            background: color.adjust(mat.m2-get-color-from-palette($background, background), $hue: 0.005);
+        }
+    }
+}

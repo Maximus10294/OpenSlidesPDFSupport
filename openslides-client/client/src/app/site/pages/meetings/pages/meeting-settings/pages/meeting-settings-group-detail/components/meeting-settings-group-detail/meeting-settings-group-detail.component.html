@@ -1,0 +1,74 @@
+<os-head-bar [hasMainButton]="false" [isSearchEnabled]="false" [nav]="false">
+    <!-- Title -->
+    <div class="title-slot">
+        @if (settingsGroup) {
+            <h1 class="mock-h2" translate>{{ settingsGroup.label }}</h1>
+        }
+    </div>
+
+    <!-- Menu -->
+    <ng-container class="menu-slot">
+        <button
+            mat-button
+            matTooltip="{{ 'Save all changes' | translate }}"
+            [disabled]="!hasChanges() || hasErrors()"
+            (click)="saveAll()"
+        >
+            <strong class="upper">{{ 'Save' | translate }}</strong>
+        </button>
+        <button mat-icon-button type="button" [matMenuTriggerFor]="settingsMenu"><mat-icon>more_vert</mat-icon></button>
+    </ng-container>
+</os-head-bar>
+
+<div class="spacer-top-20"></div>
+
+@if (settingsGroup) {
+    <mat-card class="os-card spacer-bottom-60">
+        <mat-card-content>
+            <div id="wrapper">
+                @for (subgroup of settingsGroup.subgroups; track $index) {
+                    @if (settingsGroup.subgroups.length > 1) {
+                        <h3 class="accent">{{ subgroup.label | translate }}</h3>
+                    }
+                    @for (setting of subgroup.settings; track setting) {
+                        @if (isSettingsInput(setting) && !setting.hide) {
+                            <os-meeting-settings-group-detail-field
+                                #settingsFields
+                                [disabled]="isSettingDisabled(setting) || isForbidden(setting)"
+                                [setting]="setting"
+                                [value]="meeting && getDetailFieldValue(meeting, setting)"
+                                (update)="updateSetting($event)"
+                            ></os-meeting-settings-group-detail-field>
+                        }
+                        @if (!isSettingsInput(setting)) {
+                            <div class="settings-help-container">
+                                @if (setting.text) {
+                                    <span class="settings-help-text" [innerHtml]="setting.text | translate"></span>
+                                }
+                                @if (setting.buttonLabel && setting.buttonLink) {
+                                    @if (hasExternalLink(setting)) {
+                                        <a color="primary" mat-stroked-button [href]="getHelpLink(setting)">
+                                            {{ setting.buttonLabel | translate }}
+                                        </a>
+                                    }
+                                    @if (!hasExternalLink(setting)) {
+                                        <a color="primary" mat-stroked-button [routerLink]="getHelpLink(setting)">
+                                            {{ setting.buttonLabel | translate }}
+                                        </a>
+                                    }
+                                }
+                            </div>
+                        }
+                    }
+                }
+            </div>
+        </mat-card-content>
+    </mat-card>
+}
+
+<mat-menu #settingsMenu="matMenu">
+    <button mat-menu-item (click)="resetAll()">
+        <mat-icon>undo</mat-icon>
+        <span>{{ 'Reset to default settings' | translate }}</span>
+    </button>
+</mat-menu>

@@ -1,0 +1,32 @@
+<div>
+    <mat-card class="meta-text-block">
+        <mat-card-header class="os-mat-card-header">
+            <div class="title-container">
+                <div class="ellipsis-overflow">
+                    <ng-container *ngTemplateOutlet="title"></ng-container>
+                </div>
+                @if (showActionRow) {
+                    <div class="action-row">
+                        <ng-container *ngTemplateOutlet="actionRow"></ng-container>
+                    </div>
+                }
+            </div>
+        </mat-card-header>
+        <mat-card-content>
+            <!-- Content -->
+            <os-expandable-content-wrapper [disableExpandControl]="disableExpandControl">
+                <ng-container *ngTemplateOutlet="content"></ng-container>
+            </os-expandable-content-wrapper>
+        </mat-card-content>
+    </mat-card>
+</div>
+
+<ng-template #title>
+    <ng-content select=".meta-text-block-title" />
+</ng-template>
+<ng-template #content>
+    <ng-content select=".meta-text-block-content" />
+</ng-template>
+<ng-template #actionRow>
+    <ng-content select=".meta-text-block-action-row" />
+</ng-template>

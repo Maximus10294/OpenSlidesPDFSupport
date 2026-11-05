@@ -1,0 +1,89 @@
+<os-call-dialog [ngClass]="{ hide: (isJitsiDialogOpen | async) === false }" />
+
+<div class="jitsi-list">
+    <!-- Jitsi content window -->
+    <div class="content">
+        <!-- The "somewhere else active" warning -->
+        @if ((isJitsiActiveInAnotherTab | async) && !isJitsiActive) {
+            <div class="disconnected">
+                <div>
+                    <div>{{ 'A conference is already running in your OpenSlides session.' | translate }}</div>
+                    <button color="warn" mat-button (click)="forceStart()">
+                        <span>{{ 'Reenter to conference room' | translate }}</span>
+                    </button>
+                </div>
+            </div>
+        }
+        @if (isDisconnected && (isJitsiActiveInAnotherTab | async) === false) {
+            <div class="disconnected">
+                <mat-icon>cloud_off</mat-icon>
+            </div>
+        }
+        @if (isConnecting) {
+            <div class="disconnected">
+                <mat-spinner></mat-spinner>
+            </div>
+        }
+
+        <!-- user list -->
+        @if (isConnected) {
+            <div class="room-members">
+                @if (showParticles | async) {
+                    <os-applause-particle-display class="room-list-applause-particles"></os-applause-particle-display>
+                }
+                <ol class="member-list">
+                    @for (member of memberObservable | async | entries: valueNameOrder; track $index) {
+                        <li>
+                            <div class="member-list-entry">
+                                {{ member.value.name }}
+                            </div>
+                        </li>
+                    }
+                </ol>
+            </div>
+        }
+    </div>
+
+    <!-- Custom control buttons -->
+    <div>
+        <mat-divider></mat-divider>
+        <div class="control-grid">
+            <div class="control-buttons">
+                <!-- Hangup -->
+                @if (showHangUp) {
+                    <button color="warn" mat-mini-fab matTooltip="{{ 'Leave' | translate }}" (click)="hangUp()">
+                        <mat-icon>call_end</mat-icon>
+                    </button>
+                }
+
+                <!-- Enter jitsi manually -->
+                @if (!isJoined) {
+                    <button
+                        color="accent"
+                        mat-mini-fab
+                        matTooltip="{{ 'Enter conference room' | translate }}"
+                        [disabled]="(canEnterCall | async) === false || isConnecting"
+                        (click)="callRoom()"
+                    >
+                        <mat-icon>call</mat-icon>
+                    </button>
+                }
+            </div>
+            <div class="exit">
+                <!-- Exit jitsi, view stream -->
+                <ng-container *osPerms="permission.meetingCanSeeLivestream">
+                    @if (hasLiveStreamUrl | async) {
+                        <button
+                            color="primary"
+                            mat-icon-button
+                            matTooltip="{{ 'Continue livestream' | translate }}"
+                            (click)="viewStream()"
+                        >
+                            <mat-icon>live_tv</mat-icon>
+                        </button>
+                    }
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>

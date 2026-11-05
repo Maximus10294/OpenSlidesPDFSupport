@@ -1,0 +1,80 @@
+@use 'font-variables.scss';
+
+/** Regular */
+@font-face {
+    font-family: font-variables.$font;
+    font-style: normal;
+    font-display: swap;
+    font-weight: font-variables.$font-weight-regular;
+    src: font-variables.$font-regular;
+}
+
+/** Italic */
+@font-face {
+    font-family: font-variables.$font;
+    font-style: italic;
+    font-display: swap;
+    font-weight: font-variables.$font-weight-italic;
+    src: font-variables.$font-italic;
+}
+
+/** Medium */
+@font-face {
+    font-family: font-variables.$font;
+    font-style: normal;
+    font-display: swap;
+    font-weight: font-variables.$font-weight-medium;
+    src: font-variables.$font-medium;
+}
+
+/** Medium Italic */
+@font-face {
+    font-family: font-variables.$font;
+    font-style: italic;
+    font-display: swap;
+    font-weight: font-variables.$font-weight-medium-italic;
+    src: font-variables.$font-medium-italic;
+}
+
+/** Condensed Regular */
+@font-face {
+    font-family: font-variables.$font-condensed;
+    font-style: normal;
+    font-display: swap;
+    font-weight: font-variables.$font-weight-condensed-regular;
+    src: font-variables.$font-condensed-regular;
+}
+
+/** Countown */
+@font-face {
+    font-family: font-variables.$font-monospace;
+    font-style: normal;
+    font-display: swap;
+    font-weight: font-variables.$font-weight-monospace;
+    src: font-variables.$font-monospace-src;
+}
+
+/** Chyron Name */
+@font-face {
+    font-family: font-variables.$font-chyronname;
+    font-style: normal;
+    font-display: swap;
+    font-weight: font-variables.$font-weight-chyronname;
+    src: font-variables.$font-chyronname-src;
+}
+
+/** projectorH1 */
+@font-face {
+    font-family: font-variables.$font-projectorH1;
+    font-style: normal;
+    font-display: swap;
+    src: font-variables.$font-projectorH1-src;
+}
+
+/** projectorH2 */
+@font-face {
+    font-family: font-variables.$font-projectorH2;
+    font-style: normal;
+    font-display: swap;
+    src: font-variables.$font-projectorH2-src;
+}

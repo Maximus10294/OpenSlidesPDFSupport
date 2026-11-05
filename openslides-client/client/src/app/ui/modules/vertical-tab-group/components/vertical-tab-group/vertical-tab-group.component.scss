@@ -1,0 +1,16 @@
+.vertical-tab-group-wrapper {
+    display: flex;
+    height: 100%;
+
+    .vertical-tab-group-label-wrapper {
+        position: relative;
+
+        .vertical-tab-label {
+            position: relative;
+        }
+
+        .vertical-tab-label:hover {
+            background-color: rgba(0, 0, 0, 0.025);
+        }
+    }
+}

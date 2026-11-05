@@ -1,0 +1,146 @@
+<os-head-bar
+    [hasMainButton]="canManageAssignments"
+    [mainActionTooltip]="'New election' | translate"
+    [multiSelectMode]="isMultiSelect"
+    (mainEvent)="onPlusButton()"
+>
+    <!-- Title -->
+    <div class="title-slot">
+        <h1 class="mock-h2" translate>Elections</h1>
+    </div>
+    <!-- Menu -->
+    <ng-container class="menu-slot">
+        <button mat-icon-button type="button" [matMenuTriggerFor]="assignmentMenu">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+    </ng-container>
+
+    <!-- Multiselect info -->
+    <ng-container class="central-info-slot">
+        <button mat-icon-button (click)="toggleMultiSelect()"><mat-icon>arrow_back</mat-icon></button>
+        <span>{{ selectedRows.length }}&nbsp;{{ 'selected' | translate }}</span>
+    </ng-container>
+</os-head-bar>
+
+<os-projectable-list
+    [filterProps]="filterProps"
+    [filterService]="filterService"
+    [hiddenInMobile]="getColumnsHiddenInMobile()"
+    [listObservableProvider]="repo"
+    [multiSelect]="isMultiSelect"
+    [sortService]="sortService"
+    [(selectedRows)]="selectedRows"
+>
+    <!-- Title -->
+    <div *osScrollingTableCell="'title'; row as assignment; rowContext as rowContext" class="cell-slot fill">
+        @if (!isMultiSelect) {
+            <os-detail-view-navigator [model]="assignment"></os-detail-view-navigator>
+        }
+        <div class="innerTable overflow-hidden">
+            <div class="title-line ellipsis-overflow">
+                {{ assignment.getListTitle() }}
+            </div>
+            @if (vp.isMobile) {
+                <mat-basic-chip class="bg-primary ellipsis-overflow">
+                    {{ assignment.phaseString | translate }}
+                </mat-basic-chip>
+            }
+        </div>
+    </div>
+
+    <!-- Phase -->
+    <div
+        *osScrollingTableCell="'phase'; row as assignment; config: { width: 180 }"
+        class="cell-slot fill mat-chip-wrapper"
+    >
+        <mat-basic-chip class="bg-primary">
+            {{ assignment.phaseString | translate }}
+        </mat-basic-chip>
+    </div>
+
+    <!-- Candidates -->
+    <div *osScrollingTableCell="'candidates'; row as assignment; config: { width: 40 }" class="cell-slot fill">
+        <mat-basic-chip class="bg-accent" matTooltip="{{ 'Number of candidates' | translate }}">
+            {{ getCandidateAmount(assignment) }}
+        </mat-basic-chip>
+    </div>
+
+    <!-- Menu -->
+    <div *osScrollingTableCell="'menu'; row as assignment; config: { width: 40 }" class="cell-slot fill">
+        <button
+            mat-icon-button
+            [disabled]="isMultiSelect"
+            [matMenuTriggerData]="{ assignment: assignment }"
+            [matMenuTriggerFor]="singleItemMenu"
+            (click)="$event.stopPropagation()"
+        >
+            <mat-icon>more_vert</mat-icon>
+        </button>
+    </div>
+</os-projectable-list>
+
+<!-- Menu for mobile entries -->
+<mat-menu #singleItemMenu="matMenu">
+    <ng-template let-assignment="assignment" matMenuContent>
+        <os-projector-button [menuItem]="true" [object]="assignment" />
+        <os-speaker-button [menuItem]="true" [object]="assignment" />
+    </ng-template>
+</mat-menu>
+
+<mat-menu #assignmentMenu="matMenu">
+    @if (!isMultiSelect) {
+        <div>
+            <button *osPerms="permission.assignmentCanManage" mat-menu-item (click)="toggleMultiSelect()">
+                <mat-icon>library_add</mat-icon>
+                <span>{{ 'Multiselect' | translate }}</span>
+            </button>
+            <button mat-menu-item (click)="downloadAssignmentButton()">
+                <mat-icon>archive</mat-icon>
+                <span>{{ 'Export as PDF' | translate }}</span>
+            </button>
+            <div *osPerms="permission.meetingCanManageSettings">
+                <mat-divider></mat-divider>
+                <!-- Settings -->
+                <button mat-menu-item [routerLink]="['/', activeMeetingId, 'settings', 'elections']">
+                    <mat-icon>settings</mat-icon>
+                    <span>{{ 'Settings' | translate }}</span>
+                </button>
+            </div>
+        </div>
+    }
+    @if (isMultiSelect) {
+        <div>
+            <button mat-menu-item (click)="selectAll()">
+                <mat-icon>done_all</mat-icon>
+                <span>{{ 'Select all' | translate }}</span>
+            </button>
+            <button mat-menu-item [disabled]="!selectedRows.length" (click)="deselectAll()">
+                <mat-icon>clear</mat-icon>
+                <span>{{ 'Deselect all' | translate }}</span>
+            </button>
+            <mat-divider></mat-divider>
+            <!-- Add to projector queue -->
+            <os-projector-button
+                [disabled]="!selectedRows.length"
+                [hideMainButton]="true"
+                [menuItem]="true"
+                [object]="addToProjectorQueue()"
+            ></os-projector-button>
+            <button mat-menu-item [disabled]="!selectedRows.length" (click)="downloadAssignmentButton(selectedRows)">
+                <mat-icon>archive</mat-icon>
+                <span>{{ 'Export selected elections' | translate }}</span>
+            </button>
+            <mat-divider></mat-divider>
+            <button
+                *osPerms="permission.assignmentCanManage"
+                class="red-warning-text"
+                mat-menu-item
+                [disabled]="!selectedRows.length"
+                (click)="deleteSelected()"
+            >
+                <mat-icon>delete</mat-icon>
+                <span>{{ 'Delete' | translate }}</span>
+            </button>
+        </div>
+    }
+</mat-menu>

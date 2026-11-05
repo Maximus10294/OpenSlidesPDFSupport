@@ -1,0 +1,15 @@
+<os-sidenav #sideNav>
+    <ng-template osSidenavDrawerContent>
+        <os-organization-navigation />
+    </ng-template>
+    <ng-template osSidenavMainContent>
+        <main class="background--default">
+            <div>
+                <os-global-headbar></os-global-headbar>
+                <div class="scrollable-content">
+                    <router-outlet #o="outlet"></router-outlet>
+                </div>
+            </div>
+        </main>
+    </ng-template>
+</os-sidenav>

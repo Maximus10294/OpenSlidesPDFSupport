@@ -1,0 +1,10 @@
+.file-info-cell {
+    display: flex;
+    flex-direction: column;
+}
+
+mat-form-field {
+    mat-label {
+        color: var(--mat-form-field-filled-label-text-color);
+    }
+}

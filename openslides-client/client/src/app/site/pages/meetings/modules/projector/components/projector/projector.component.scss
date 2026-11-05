@@ -1,0 +1,30 @@
+#container {
+    background-color: lightgoldenrodyellow;
+    position: relative;
+    overflow: hidden;
+
+    #offline-indicator {
+        top: 0 !important;
+        right: 0;
+        color: #000000;
+        opacity: 0.3;
+        position: absolute;
+        z-index: 100;
+        .mat-icon {
+            font-size: 8pt;
+            vertical-align: top;
+            text-align: right;
+        }
+    }
+
+    #projector {
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform-origin: left top;
+        overflow: hidden;
+        font-size: 22px !important;
+        line-height: 24px !important;
+        border: none;
+    }
+}

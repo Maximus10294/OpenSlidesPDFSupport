@@ -1,0 +1,322 @@
+<os-head-bar
+    mainButtonIcon="edit"
+    [editMode]="isEditingUser"
+    [goBack]="false"
+    [hasMainButton]="canEdit"
+    [isSaveButtonEnabled]="isFormValid"
+    [mainActionTooltip]="'Edit account' | translate"
+    [nav]="false"
+    [saveAction]="getSaveAction()"
+    (cancelEditEvent)="onCancel()"
+    (mainEvent)="editMember()"
+>
+    <!-- Title -->
+    <div class="title-slot">
+        <h1 class="mock-h2">
+            @if (isNewUser) {
+                {{ 'New account' | translate }}
+            } @else {
+                {{ user?.full_name }}
+            }
+        </h1>
+    </div>
+
+    <!-- Menu -->
+    <ng-container *osOmlPerms="userOML" class="menu-slot">
+        <button mat-icon-button type="button" [matMenuTriggerFor]="userExtraMenu">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+    </ng-container>
+</os-head-bar>
+
+<os-user-detail-view
+    [additionalFormControls]="additionalFormControls"
+    [generatePasswordFn]="getRandomPasswordFn()"
+    [isEditing]="isEditingUser"
+    [isNewUser]="isNewUser"
+    [shouldEnableFormControlFn]="shouldEnableFormControlFn"
+    [user]="user"
+    (changeEvent)="personalInfoFormValue = $event"
+    (errorEvent)="formErrors = $event"
+    (validEvent)="isFormValid = $event"
+>
+    <ng-template #editView let-form="form">
+        <h2>{{ 'Organization specific information' | translate }}</h2>
+        <div [formGroup]="form">
+            <!-- Home committee -->
+            <div class="home-committee-area">
+                <mat-form-field class="form50 force-min-width">
+                    <mat-label>{{ 'Home committee' | translate }}</mat-label>
+                    <os-repo-search-selector
+                        formControlName="home_committee_id"
+                        [includeNone]="true"
+                        [multiple]="false"
+                        [repo]="committeeController"
+                        [sortService]="committeeSortService"
+                        [subscriptionConfig]="committeeSubscriptionConfig"
+                        [transformPropagateFn]="getTransformPropagateFn()"
+                        [transformSetFn]="getTransformSetHomeCommitteeFn()"
+                    ></os-repo-search-selector>
+                </mat-form-field>
+                <mat-checkbox class="form50 external-margin-top force-min-width" formControlName="external">
+                    {{ 'external' | translate }}
+                </mat-checkbox>
+            </div>
+            <!-- Committee admin -->
+            <div *osOmlPerms="OML.can_manage_organization">
+                <mat-form-field class="form100 force-min-width">
+                    <mat-label>{{ 'Committee admin' | translate }}</mat-label>
+                    <os-repo-search-selector
+                        formControlName="committee_management_ids"
+                        [multiple]="true"
+                        [repo]="committeeController"
+                        [sortService]="committeeSortService"
+                        [subscriptionConfig]="committeeSubscriptionConfig"
+                        [transformPropagateFn]="getTransformPropagateFn()"
+                        [transformSetFn]="getTransformSetFn()"
+                    ></os-repo-search-selector>
+                </mat-form-field>
+            </div>
+            <!-- Administration roles (at organization level) -->
+            <div *osOmlPerms="OML.can_manage_users">
+                <mat-form-field class="form100 force-min-width">
+                    <mat-label>{{ 'Administration roles (at organization level)' | translate }}</mat-label>
+                    <mat-select formControlName="organization_management_level">
+                        @if (!orgaManagementLevelChangeDisabled) {
+                            <mat-option [value]="null">-</mat-option>
+                        }
+                        @for (level of organizationManagementLevels; track level) {
+                            <mat-option [disabled]="orgaManagementLevelChangeDisabled" [value]="level">
+                                {{ getOmlVerboseName(level) | translate }}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+        <!-- Default Vote weight -->
+        <div [formGroup]="form">
+            <mat-form-field class="form100 force-min-width">
+                <mat-label>{{ 'Default vote weight' | translate }}</mat-label>
+                <input formControlName="default_vote_weight" matInput type="number" />
+                @if (isDefaultVoteWeightError && form.controls['default_vote_weight'].value > 0) {
+                    <mat-error translate>Please select a vote weight greater than or equal to 0.000001</mat-error>
+                }
+                @if (isDefaultVoteWeightError && form.controls['default_vote_weight'].value <= 0) {
+                    <mat-error translate>Please select a vote weight greater than zero.</mat-error>
+                }
+            </mat-form-field>
+        </div>
+    </ng-template>
+
+    <ng-template #showView let-user="user">
+        <h2>{{ 'Organization specific information' | translate }}</h2>
+        <!-- Organization management level -->
+        @if (user.organization_management_level) {
+            <div>
+                <h4>{{ 'Administration roles (at organization level)' | translate }}</h4>
+                <span>{{ getOmlVerboseName(user.organization_management_level) | translate }}</span>
+            </div>
+        }
+        @if (user.home_committee_id) {
+            <div>
+                <h4>{{ 'Home committee' | translate }}</h4>
+                <a [routerLink]="'/committees/' + user.home_committee_id">
+                    {{ user.home_committee.name }}
+                </a>
+            </div>
+        }
+        <!-- Default vote weight -->
+        @if (user.default_vote_weight || user.default_vote_weight === 0) {
+            <div>
+                <h4>{{ 'Default vote weight' | translate }}</h4>
+                <span>{{ user.default_vote_weight }}</span>
+            </div>
+        }
+        <!-- Last email sent -->
+        @if (user?.isLastEmailSent) {
+            <div>
+                <div>
+                    <h4>{{ 'Last email sent' | translate }}</h4>
+                    <span>{{ user.last_email_sent | localizedDate }}</span>
+                </div>
+            </div>
+        }
+        <!-- Last login -->
+        <div>
+            @if (user?.isLastLogin) {
+                <div>
+                    <h4>{{ 'Last login' | translate }}</h4>
+                    <span>{{ user.last_login | localizedDate }}</span>
+                </div>
+            }
+        </div>
+    </ng-template>
+
+    <ng-template #showView let-user="user">
+        <!-- Meeting Table -->
+        <ng-container>
+            <h2>{{ 'Committees and meetings' | translate }}</h2>
+            @if (canSeeParticipationTable) {
+                <p>
+                    {{ user.short_name }}
+                    {{ 'is assigned to the following committees, meetings and groups' | translate }}:
+                </p>
+            }
+            @if (!canSeeParticipationTable) {
+                <p>{{ user.short_name }} {{ 'is not assigned to any committees or meetings yet' | translate }}.</p>
+            }
+
+            @if (canSeeParticipationTable) {
+                <table class="participation-table">
+                    <tr class="header-underline">
+                        <th>
+                            <span translate>Committees</span>
+                            ({{ numCommittees }})
+                        </th>
+                        @if (comitteeAdministrationAmount) {
+                            <th class="admin-column">({{ comitteeAdministrationAmount }})</th>
+                        }
+                        <th>
+                            <span translate>Meetings</span>
+                            ({{ user.meetings?.length }})
+                        </th>
+                        <th translate>Groups</th>
+                    </tr>
+                    @for (row of tableData | keyvalue: tableDataAscOrderCompare; track row; let lastLine = $last) {
+                        <!-- Handle committees without meetings-->
+                        @if (!getNumberOfKeys(row.value.meetings)) {
+                            <tr class="word-break" [ngClass]="getCellClass(true, true, lastLine)">
+                                <td>
+                                    <a [routerLink]="'/committees/' + row.key + ''">{{ row.value.committee_name }}</a>
+                                </td>
+                                @if (comitteeAdministrationAmount) {
+                                    <td class="admin-column">
+                                        @if (row.value.is_manager) {
+                                            <mat-icon
+                                                matTooltip="{{ 'Committee admin' | translate }}"
+                                                [matTooltipPosition]="'left'"
+                                            >
+                                                engineering
+                                            </mat-icon>
+                                        }
+                                    </td>
+                                }
+                                <td colspan="2"></td>
+                            </tr>
+                        }
+                        <!-- Handle committees with meetings-->
+                        @for (
+                            meeting_row of row.value.meetings | keyvalue: tableDataAscOrderCompare;
+                            track meeting_row;
+                            let isFirst = $first;
+                            let isLast = $last
+                        ) {
+                            <tr class="word-break" [ngClass]="getCellClass(true, true, lastLine)">
+                                @if (isFirst) {
+                                    <td [attr.rowspan]="getNumberOfKeys(row.value.meetings)">
+                                        <a [routerLink]="'/committees/' + row.key + ''">
+                                            {{ row.value.committee_name }}
+                                        </a>
+                                    </td>
+                                }
+                                @if (isFirst && comitteeAdministrationAmount) {
+                                    <td class="admin-column" [attr.rowspan]="getNumberOfKeys(row.value.meetings)">
+                                        @if (row.value.is_manager) {
+                                            <mat-icon
+                                                matTooltip="{{ 'Committee admin' | translate }}"
+                                                [matTooltipPosition]="'left'"
+                                            >
+                                                engineering
+                                            </mat-icon>
+                                        }
+                                    </td>
+                                }
+                                <td class="word-break" [ngClass]="getCellClass(false, isLast, lastLine)">
+                                    <!-- Is Archived -->
+                                    @if (meeting_row.value.is_archieved) {
+                                        <span class="icon">
+                                            <mat-icon
+                                                [matTooltip]="'Archived' | translate"
+                                                [matTooltipPosition]="'left'"
+                                            >
+                                                archive
+                                            </mat-icon>
+                                        </span>
+                                    }
+
+                                    <!--- Is public -->
+                                    @if (meeting_row.value.is_public) {
+                                        <span class="icon">
+                                            <mat-icon [matTooltip]="'Public' | translate" [matTooltipPosition]="'left'">
+                                                public
+                                            </mat-icon>
+                                        </span>
+                                    }
+
+                                    <!--- Is locked from inside -->
+                                    @if (meeting_row.value.is_closed) {
+                                        <span class="icon">
+                                            <mat-icon [matTooltip]="'Closed' | translate" [matTooltipPosition]="'left'">
+                                                lock
+                                            </mat-icon>
+                                        </span>
+                                    }
+                                    @if (meeting_row.value.is_accessible) {
+                                        <a [routerLink]="'/' + meeting_row.key + ''">
+                                            {{ meeting_row.value.meeting_name }}
+                                        </a>
+                                    } @else {
+                                        {{ meeting_row.value.meeting_name }}
+                                    }
+                                </td>
+                                <td class="word-break" [ngClass]="getCellClass(false, isLast, lastLine)">
+                                    @for (group of meeting_row.value.group_names; track group; let lastGroup = $last) {
+                                        <span>{{ group }}{{ !lastGroup ? ', ' : '' }}</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </table>
+            }
+        </ng-container>
+    </ng-template>
+</os-user-detail-view>
+
+<ng-template #modelListTemplate let-models="models">
+    <ol>
+        @for (model of models; track model) {
+            <li>
+                {{ model.getTitle() | translate }}
+            </li>
+        }
+    </ol>
+</ng-template>
+
+<mat-menu #userExtraMenu="matMenu">
+    @if (user && !user.saml_id && operatorHasEqualOrHigherOML) {
+        <button mat-menu-item [routerLink]="['/', 'accounts', user.id, 'password']">
+            <mat-icon>security</mat-icon>
+            <span>{{ 'Change password' | translate }}</span>
+        </button>
+    }
+    <ng-container *osOmlPerms="OML.can_manage_users; allowCommitteeAdmin: true">
+        <button mat-menu-item [routerLink]="['/', 'accounts', user?.id, 'meetings']">
+            <mat-icon>event_available</mat-icon>
+            <span>{{ 'Add to meetings' | translate }}</span>
+        </button>
+        <!-- invitation email -->
+        @if (user?.email) {
+            <button mat-menu-item (click)="sendInvitationEmail()">
+                <mat-icon>mail</mat-icon>
+                <span>{{ 'Send invitation email' | translate }}</span>
+            </button>
+        }
+        <mat-divider />
+        <button class="red-warning-text" mat-menu-item (click)="deleteUser()">
+            <mat-icon>delete</mat-icon>
+            <span>{{ 'Delete' | translate }}</span>
+        </button>
+    </ng-container>
+</mat-menu>

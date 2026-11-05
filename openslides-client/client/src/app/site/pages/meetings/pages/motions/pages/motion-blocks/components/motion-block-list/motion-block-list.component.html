@@ -1,0 +1,83 @@
+<os-head-bar
+    [hasMainButton]="canEdit"
+    [mainActionTooltip]="'New motion block' | translate"
+    [nav]="false"
+    (mainEvent)="onPlusButton()"
+>
+    <!-- Title -->
+    <div class="title-slot">
+        <h1 class="mock-h2" translate>Motion blocks</h1>
+    </div>
+</os-head-bar>
+
+<os-projectable-list
+    [filterProps]="filterProps"
+    [listObservableProvider]="repo"
+    [multiSelect]="isMultiSelect"
+    [showFilterBar]="true"
+    [sortService]="sortService"
+    [vScrollFixed]="64"
+    [(selectedRows)]="selectedRows"
+>
+    <!-- Title column -->
+    <div *osScrollingTableCell="'title'; value as title; row as block; rowContext as rowContext" class="cell-slot fill">
+        @if (!isMultiSelect) {
+            <os-detail-view-navigator [model]="block"></os-detail-view-navigator>
+        }
+        <!--
+    TODO: Tooltips do not work when hidden under the absolute link, but they can't be above it either,
+    because for some reason they don't delegate the click event. So no tooltips for now
+    -->
+        <div class="innerTable overflow-hidden">
+            <os-icon-container
+                size="large"
+                [icon]="getIndicatingIcon(block)"
+                [iconTooltip]="getIndicatingTooltip(block) | translate"
+                [noWrap]="true"
+            >
+                <os-icon-container
+                    icon="lock"
+                    size="large"
+                    [iconTooltip]="'Internal' | translate"
+                    [noWrap]="true"
+                    [showIcon]="block.isFinished && block.internal"
+                >
+                    <div class="ellipsis-overflow">
+                        {{ title }}
+                    </div>
+                </os-icon-container>
+            </os-icon-container>
+        </div>
+    </div>
+
+    <!-- Amount -->
+    <div *osScrollingTableCell="'amount'; row as block; config: { width: 60 }" class="cell-slot fill">
+        <span class="os-amount-chip" matTooltip="{{ 'Motions' | translate }}" matTooltipPosition="left">
+            {{ getMotionAmount(block) }}
+        </span>
+    </div>
+
+    <!-- Menu -->
+    <div
+        *osScrollingTableCell="'menu'; row as block; config: { width: 40, position: END_POSITION }"
+        class="cell-slot fill"
+    >
+        <button
+            mat-icon-button
+            [disabled]="isMultiSelect"
+            [matMenuTriggerData]="{ block: block }"
+            [matMenuTriggerFor]="singleItemMenu"
+            (click)="$event.stopPropagation()"
+        >
+            <mat-icon>more_vert</mat-icon>
+        </button>
+    </div>
+</os-projectable-list>
+
+<!-- Menu for mobile entries -->
+<mat-menu #singleItemMenu="matMenu">
+    <ng-template let-block="block" matMenuContent>
+        <os-projector-button [menuItem]="true" [object]="block" />
+        <os-speaker-button [menuItem]="true" [object]="block" />
+    </ng-template>
+</mat-menu>

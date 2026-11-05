@@ -1,0 +1,73 @@
+.assign-meetings-element {
+    width: 100%;
+    margin: 10px 20px;
+}
+
+.assign-meetings-subtext {
+    margin-bottom: 10px;
+}
+
+.result-table {
+    table-layout: fixed;
+    text-align: left;
+    border-collapse: collapse;
+    width: 95%;
+    margin-left: 0px;
+
+    tr {
+        border: none;
+    }
+
+    td,
+    th {
+        vertical-align: top;
+        padding: 0;
+
+        .assign-meetings-name-line {
+            padding-bottom: 10px;
+        }
+    }
+
+    td:first-child,
+    th:first-child {
+        width: 40px;
+    }
+}
+
+.assign-meetings-form {
+    margin: 0;
+}
+
+.form-element {
+    width: 100%;
+}
+
+.form-wrapper {
+    width: 95%;
+    display: grid;
+    grid-template-columns: 1fr 75px;
+    grid-gap: 0 20px;
+
+    .long-child {
+        grid-column: 1 / 3;
+    }
+}
+
+.potential-warning {
+    height: 25px;
+
+    .mat-icon {
+        display: inline-flex;
+        vertical-align: middle;
+        $icon-size: 16px;
+    }
+}
+
+.await-result-spinner {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.result-success-icon {
+    color: lightgreen;
+}

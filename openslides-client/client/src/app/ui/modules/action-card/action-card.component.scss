@@ -1,0 +1,36 @@
+@use 'src/assets/styles/mixins/button.scss';
+
+.meta-text-block {
+    padding: 0px;
+    margin: 20px 0;
+    min-width: 200px;
+
+    .mat-mdc-icon-button {
+        @include button.custom-size-button(34px, 18px);
+    }
+    .mat-mdc-card-header {
+        font-size: 16px;
+        font-weight: 400;
+
+        .title-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 40px;
+
+            .action-row {
+                display: flex;
+            }
+        }
+    }
+    .mat-mdc-card-content {
+        padding-top: 16px;
+    }
+}
+
+.os-mat-card-header {
+    padding-top: 0 !important;
+    padding-left: 10px !important;
+    padding-right: 8px !important;
+}

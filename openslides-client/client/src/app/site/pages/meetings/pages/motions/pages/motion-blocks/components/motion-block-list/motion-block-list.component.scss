@@ -1,0 +1,11 @@
+@use 'src/assets/styles/tables.scss';
+
+.mat-mdc-dialog-container {
+    .mat-mdc-dialog-title {
+        margin: 0;
+    }
+
+    .mat-mdc-form-field {
+        width: 100%;
+    }
+}

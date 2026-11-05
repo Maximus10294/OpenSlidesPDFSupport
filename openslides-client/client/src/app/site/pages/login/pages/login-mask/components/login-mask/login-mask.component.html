@@ -1,0 +1,113 @@
+<div class="form-wrapper">
+    @if ({ organization: organizationObservable | async }; as observables) {
+        @if (meeting || observables.organization) {
+            <div class="header-name" [@fadeIn]>
+                <!-- Meeting's name -->
+                @if (meeting && meeting.name) {
+                    <h1>{{ meeting.name }}</h1>
+                }
+                <!-- Organization's name -->
+                @if (observables.organization && !meeting) {
+                    <h1>
+                        {{ observables.organization.name }}
+                    </h1>
+                }
+            </div>
+        }
+    }
+
+    <!-- Install notice -->
+    @if (installationNotice) {
+        <div class="login-container">
+            <mat-card>
+                <mat-card-content [innerHTML]="installationNotice | translate"></mat-card-content>
+            </mat-card>
+        </div>
+    }
+
+    @if (!loading) {
+        @if (!samlEnabled) {
+            <ng-container *ngTemplateOutlet="loginform; context: { showExtra: true }"></ng-container>
+        } @else {
+            <div class="login-container">
+                <button
+                    class="login-button"
+                    color="primary"
+                    mat-raised-button
+                    osAutofocus
+                    type="button"
+                    (click)="samlLogin()"
+                >
+                    {{ samlLoginButtonText || 'SSO Login' }}
+                </button>
+                @if (guestsEnabled) {
+                    <button class="login-button" mat-stroked-button type="button" (click)="guestLogin()">
+                        {{ 'Public access' | translate }}
+                    </button>
+                }
+                <mat-expansion-panel class="spacer-bottom-10 spacer-top-25" style="border-radius: 4px !important">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            {{ 'Internal login' | translate }}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div>
+                        <ng-container *ngTemplateOutlet="loginform; context: { showExtra: false }"></ng-container>
+                    </div>
+                </mat-expansion-panel>
+            </div>
+        }
+    }
+</div>
+
+<ng-template #loginform let-showExtra="showExtra">
+    <form [formGroup]="loginForm" [ngClass]="{ 'login-container': showExtra }" (ngSubmit)="formLogin()">
+        <mat-form-field>
+            <mat-label>{{ 'Username' | translate }}</mat-label>
+            <input data-cy="loginUsernameInput" formControlName="username" matInput osAutofocus required />
+        </mat-form-field>
+        <br />
+        <mat-form-field>
+            <mat-label>{{ 'Password' | translate }}</mat-label>
+            <input
+                data-cy="loginPasswordInput"
+                formControlName="password"
+                matInput
+                required
+                [type]="!hide ? 'password' : 'text'"
+            />
+            <mat-icon color="primary" matSuffix (click)="hide = !hide">
+                {{ hide ? 'visibility_off' : 'visibility_on' }}
+            </mat-icon>
+        </mat-form-field>
+        <mat-error>{{ loginErrorMsg | translate }}</mat-error>
+
+        <!-- login button -->
+        <br />
+        <button
+            class="login-button"
+            color="primary"
+            data-cy="loginButton"
+            mat-raised-button
+            type="submit"
+            [disabled]="loginForm.invalid || isWaitingOnLogin"
+        >
+            @if (!isWaitingOnLogin) {
+                <span>{{ 'Login' | translate }}</span>
+            } @else {
+                <os-spinner [height]="20" [showText]="false" [width]="20"></os-spinner>
+            }
+        </button>
+        @if (guestsEnabled && showExtra && orgaPublicAccessEnabled) {
+            <button class="login-button" mat-stroked-button type="button" (click)="guestLogin()">
+                {{ 'Public access' | translate }}
+            </button>
+        }
+
+        <!-- forgot password button -->
+        <br />
+        <button class="forgot-password-button" color="primary" mat-button type="button" (click)="resetPassword()">
+            {{ 'Forgot Password?' | translate }}
+        </button>
+    </form>
+</ng-template>

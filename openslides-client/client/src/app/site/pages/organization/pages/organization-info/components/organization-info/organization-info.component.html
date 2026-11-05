@@ -1,0 +1,23 @@
+<os-head-bar [goBack]="true" [nav]="false">
+    <div class="title-slot">
+        <h1 class="mock-h2">{{ 'Legal notice' | translate }} / {{ 'Privacy policy' | translate }}</h1>
+    </div>
+</os-head-bar>
+
+<os-legal-notice-content [isEditable]="true" (update)="updateLegalNotice($event)" />
+
+<os-info-actions />
+
+@if (isManager) {
+    <mat-card class="os-card">
+        <mat-card-content>
+            <h2>{{ 'Statistics' | translate }}</h2>
+            <div>
+                <h3>{{ 'Organization' | translate }}</h3>
+                <os-organization-statistics></os-organization-statistics>
+            </div>
+        </mat-card-content>
+    </mat-card>
+}
+
+<os-privacy-policy-content [isEditable]="true" (update)="updatePrivacyPolicy($event)" />

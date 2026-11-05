@@ -1,0 +1,63 @@
+.user-delete-dialog-content {
+    display: flex;
+    height: 50vh;
+
+    .user-list-block {
+        width: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+
+        .section-title {
+            height: 30px;
+            margin: 0;
+        }
+
+        .user-list-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+
+            .cdk-virtual-scroll-viewport {
+                flex: 1;
+
+                .cdk-virtual-scroll-content-wrapper {
+                    width: 100%;
+                }
+            }
+        }
+
+        .user {
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.025);
+            }
+            & {
+                mat-icon {
+                    min-width: 24px;
+                }
+            }
+        }
+
+        p {
+            margin: 4px 0;
+            width: 100%;
+        }
+    }
+
+    .user-detail-block {
+        flex: 1;
+
+        .user-name {
+            font-size: 16px;
+        }
+    }
+
+    .committee-title,
+    .meeting-title {
+        font-weight: 500;
+        margin-left: -15px;
+        ~ li {
+            font-size: 13px;
+        }
+    }
+}

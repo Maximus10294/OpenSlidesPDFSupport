@@ -1,0 +1,85 @@
+<os-head-bar
+    [hasMainButton]="canEdit"
+    [mainActionTooltip]="'New category' | translate"
+    [nav]="false"
+    (mainEvent)="onPlusButton()"
+>
+    <!-- Title -->
+    <div class="title-slot">
+        <h1 class="mock-h2" translate>Categories</h1>
+    </div>
+
+    <!-- Menu -->
+    <ng-container *osPerms="permission.motionCanManage" class="menu-slot">
+        <button mat-icon-button type="button" [matMenuTriggerFor]="categoryMenu">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+    </ng-container>
+</os-head-bar>
+
+<os-projectable-list
+    [allowProjector]="false"
+    [filterProps]="filterProps"
+    [hiddenInMobile]="['menu']"
+    [listObservable]="categoriesObservable"
+    [showListOfSpeakers]="false"
+    [vScrollFixed]="64"
+>
+    <!-- Title -->
+    <div *osScrollingTableCell="'title'; row as category; rowContext as rowContext" class="cell-slot fill">
+        <os-detail-view-navigator [model]="category"></os-detail-view-navigator>
+        <div [style.margin-left]="getMargin(category)">{{ category.prefixedName }}</div>
+    </div>
+
+    <!-- Amount -->
+    <div *osScrollingTableCell="'amount'; row as category; config: { width: 45 }" class="cell-slot fill">
+        <span class="os-amount-chip" matTooltip="{{ 'Motions' | translate }}" matTooltipPosition="left">
+            {{ getMotionAmount(category) }}
+        </span>
+    </div>
+</os-projectable-list>
+
+<mat-menu #categoryMenu="matMenu">
+    <button mat-menu-item routerLink="sort">
+        <mat-icon>sort</mat-icon>
+        <span>{{ 'Sort categories' | translate }}</span>
+    </button>
+</mat-menu>
+
+<!-- Template for new motion block dialog -->
+<ng-template #newCategoryDialog>
+    <h1 mat-dialog-title>
+        <span>{{ 'New category' | translate }}</span>
+    </h1>
+    <mat-dialog-content class="os-form-card-mobile">
+        <form tabindex="-1" [formGroup]="createForm" (keydown)="onKeyDown($event)">
+            <!-- Prefix -->
+            <p>
+                <mat-form-field>
+                    <mat-label>{{ 'Prefix' | translate }}</mat-label>
+                    <input formControlName="prefix" matInput />
+                    <mat-error>{{ 'This prefix already exists' | translate }}</mat-error>
+                </mat-form-field>
+            </p>
+
+            <!-- Name -->
+            <p>
+                <mat-form-field>
+                    <mat-label>{{ 'Name of the new category' | translate }}</mat-label>
+                    <input formControlName="name" matInput required />
+                    <mat-error>
+                        {{ 'A name is required' | translate }}
+                    </mat-error>
+                </mat-form-field>
+            </p>
+        </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <button mat-button [disabled]="!createForm.valid" [mat-dialog-close]="true">
+            <span>{{ 'Save' | translate }}</span>
+        </button>
+        <button mat-button [mat-dialog-close]="false">
+            <span>{{ 'Cancel' | translate }}</span>
+        </button>
+    </mat-dialog-actions>
+</ng-template>

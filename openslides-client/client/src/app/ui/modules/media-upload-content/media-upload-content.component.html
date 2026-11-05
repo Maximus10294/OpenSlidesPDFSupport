@@ -1,0 +1,50 @@
+<os-file-upload
+    [addFileFn]="getAddFileFn()"
+    [parallel]="parallel"
+    [uploadFileFn]="getUploadFileFn()"
+    (uploadFailured)="errorEvent.emit($event)"
+    (uploadSucceeded)="uploadSucceeded($event)"
+>
+    <ng-template #additionalContent>
+        <!-- Directory selector-->
+        <mat-dialog-content class="os-form-card-mobile" [formGroup]="directorySelectionForm">
+            <mat-form-field>
+                <mat-label>{{ 'Upload to' | translate }}</mat-label>
+                <os-list-search-selector
+                    formControlName="directoryId"
+                    [includeNone]="true"
+                    [inputListValues]="directories"
+                    [multiple]="false"
+                />
+            </mat-form-field>
+        </mat-dialog-content>
+    </ng-template>
+
+    <div *osScrollingTableCell="'title'; row as file" class="cell-slot">
+        <div *osScrollingTableCellLabel>{{ 'Title' | translate }}</div>
+        <mat-form-field subscriptSizing="dynamic">
+            <input matInput [(ngModel)]="file.title" />
+        </mat-form-field>
+    </div>
+
+    <div *osScrollingTableCell="'filename'; row as file" class="cell-slot">
+        <div *osScrollingTableCellLabel>{{ 'Filename' | translate }}</div>
+        {{ file.mediafile.name }}
+    </div>
+
+    <div *osScrollingTableCell="'information'; row as file" class="cell-slot">
+        <div *osScrollingTableCellLabel>{{ 'Information' | translate }}</div>
+        <div class="file-info-cell">
+            <span>
+                <mat-icon [inline]="true">insert_drive_file</mat-icon>
+                {{ getFiletype(file) | translate }}
+            </span>
+            <span>
+                <mat-icon [inline]="true">data_usage</mat-icon>
+                {{ file.mediafile.size | readableBytes }}
+            </span>
+        </div>
+    </div>
+
+    <ng-content />
+</os-file-upload>

@@ -1,0 +1,14 @@
+export enum Presenter {
+    SERVERTIME = `server_time`,
+    GET_USERS = `get_users`,
+    GET_ACTIVE_USER_AMOUNT = `get_active_users_amount`,
+    GET_USER_EDITABLE = `get_user_editable`,
+    GET_USER_RELATED_MODELS = `get_user_related_models`,
+    GET_USER_SCOPE = `get_user_scope`,
+    GET_FORWARDING_COMMITTEES = `get_forwarding_committees`,
+    GET_FORWARDING_MEETINGS = `get_forwarding_meetings`,
+    GET_VALID_TIMEZONES = `get_valid_timezones`,
+    SEARCH_USERS = `search_users`,
+    SEARCH_DELETED_MODELS = `search_deleted_models`,
+    EXPORT_MEETING = `export_meeting`
+}

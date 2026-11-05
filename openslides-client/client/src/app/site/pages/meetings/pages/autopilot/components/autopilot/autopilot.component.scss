@@ -1,0 +1,63 @@
+@use 'src/assets/styles/variables.scss';
+.projector {
+    border: 1px solid #d3d3d3;
+}
+
+.content-container {
+    min-height: calc(100vh - 77px);
+    .col-wrapper {
+        max-width: 1320px;
+        margin: 0 auto;
+    }
+    @media (max-width: 700px) {
+        margin: 0 0;
+    }
+    @include variables.phone {
+        .col-wrapper {
+            display: block;
+        }
+    }
+    .col-main {
+        width: min(770px, calc(vw - 32px));
+    }
+    .col-right {
+        width: auto;
+        @media (max-width: 1840px) {
+            padding-left: 20px;
+        }
+        @media (min-width: 1841px) {
+            padding-left: 0px;
+        }
+    }
+    @media screen and (min-width: 1320px) {
+        .col-wrapper {
+            max-width: 1565px;
+        }
+        .col-right {
+            max-width: 1320px;
+        }
+    }
+    @media (max-width: 1440px) {
+        .col-right {
+            max-width: 304px;
+        }
+    }
+    @media (min-width: 1820px) {
+        .col-right {
+            max-width: 623px;
+        }
+    }
+}
+
+.split-autopilot {
+    .col-wrapper {
+        display: grid;
+        grid-template-columns: 3fr 2fr;
+        .col-main {
+            grid-column: 1 / 2;
+        }
+        .col-right {
+            grid-column: 2/3;
+        }
+    }
+}

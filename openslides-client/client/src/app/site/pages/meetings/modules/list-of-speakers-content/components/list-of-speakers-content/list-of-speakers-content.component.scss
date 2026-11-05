@@ -1,0 +1,115 @@
+@use 'src/assets/styles/variables.scss';
+@use 'src/assets/styles/mixins/button.scss';
+
+.los-title {
+    display: block;
+}
+
+.finished-list {
+    box-shadow: none !important;
+    margin-bottom: 15px;
+
+    .mat-mdc-list-item {
+        height: auto;
+        margin: 10px 0;
+    }
+}
+
+.current-speaker {
+    margin: 10px 25px 0 25px;
+    padding: 0 0.75em;
+    border-radius: 4px;
+
+    @include variables.phone {
+        margin: 10px 0 0 0;
+    }
+}
+
+.desktop-speaker-indent {
+    @include variables.desktop {
+        padding: 0 0.75em 0 calc(0.75em + 38px);
+    }
+}
+
+.current-speaker:has(+ .interposed-questions) {
+    border-bottom-right-radius: 0;
+    margin-bottom: 0;
+}
+
+.waiting-list,
+.interposed-questions {
+    padding: 10px 25px 0 25px;
+
+    @include variables.phone {
+        padding: 10px 0 0 0;
+    }
+}
+
+.interposed-questions {
+    padding-top: 0px;
+    padding-left: 40px;
+    margin-bottom: 20px;
+    .speaker {
+        margin: 1px 0 0 25px;
+        box-shadow: none;
+        padding: 0 0.75em;
+    }
+
+    .current-speaker {
+        border-radius: 0;
+    }
+
+    .speaker:first-of-type {
+        border-top-right-radius: 4px;
+        border-top-left-radius: 4px;
+    }
+
+    @supports selector(:has(*)) {
+        .speaker:first-of-type {
+            border-top-right-radius: 0;
+            border-top-left-radius: 0;
+            margin-top: 0;
+            border-top: transparent 1px solid;
+            &.current-speaker {
+                border-top-color: #fff;
+            }
+        }
+    }
+
+    .speaker:last-of-type {
+        border-bottom-right-radius: 4px;
+        border-bottom-left-radius: 4px;
+    }
+}
+
+os-sorting-list .line {
+    border-radius: 4px;
+}
+
+.add-self-buttons {
+    margin: 10px 20px;
+    display: inline-flex;
+    flex-wrap: wrap;
+
+    @include variables.phone {
+        padding: 10px 0;
+        margin: 10px 0 0 0;
+    }
+
+    button {
+        margin: 5px;
+    }
+}
+
+.search-new-speaker-form {
+    padding: 15px 25px 0 25px;
+    width: auto;
+
+    @include variables.phone {
+        padding: 15px 0 0 0;
+    }
+}
+
+.centered-text {
+    text-align: center;
+}

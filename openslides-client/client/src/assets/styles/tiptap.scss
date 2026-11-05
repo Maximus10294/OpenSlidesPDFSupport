@@ -1,0 +1,18 @@
+.tiptap,
+.tiptap-view,
+.motion-text {
+    & li > p:first-of-type {
+        margin-top: 0;
+    }
+    & li > p:last-of-type {
+        margin-bottom: 0;
+    }
+}
+
+.tiptap-view,
+.motion-text {
+    p:after {
+        content: '';
+        display: inline-block;
+    }
+}

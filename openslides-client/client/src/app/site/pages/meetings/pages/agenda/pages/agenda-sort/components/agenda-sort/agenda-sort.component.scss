@@ -1,0 +1,63 @@
+.filter-hint {
+    padding: 0 16px;
+}
+
+.sort-header {
+    display: block;
+    padding: 0 8px;
+    width: auto;
+    text-align: center;
+
+    .button-menu {
+        display: inline-block;
+    }
+
+    .left {
+        float: left;
+    }
+
+    .right {
+        float: right;
+    }
+
+    mat-drawer {
+        min-width: 320px;
+    }
+
+    .sort-drawer-content {
+        text-align: left;
+
+        .mat-mdc-button {
+            margin-left: 8px;
+        }
+    }
+
+    .current-filters {
+        display: inline-block;
+
+        div {
+            display: inline;
+        }
+    }
+}
+
+.current-nodes {
+    position: relative;
+    margin-bottom: 8px;
+}
+
+.sort-node-title {
+    min-width: 100px;
+    flex: 1;
+}
+
+.sort-node-icon {
+    margin: 0 12px 0 auto;
+
+    mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        vertical-align: middle;
+    }
+}

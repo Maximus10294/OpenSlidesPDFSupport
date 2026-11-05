@@ -1,0 +1,6 @@
+@use 'src/assets/styles/variables.scss';
+@use 'src/assets/styles/mixins/detail-view-appearance.scss';
+
+.detail-view-appearance-container {
+    @include detail-view-appearance.detail-view-appearance;
+}

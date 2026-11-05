@@ -1,0 +1,61 @@
+<!-- Moderator Note-->
+@if (listOfSpeakers && canSeeModerationNote && (canManageModerationNote || (moderatorNotes | async))) {
+    <mat-card class="spacer-bottom-60 os-card">
+        <mat-card-content style="overflow: None">
+            <!-- Title edit/save/cancle-->
+            <div class="action-title">
+                <h2 class="accessibility-h2 accessibility-h2-3 subtitle-text" translate>Moderation note</h2>
+                <div class="buttons">
+                    @if (canManageModerationNote) {
+                        @if (isEditing) {
+                            <button
+                                color="warn"
+                                mat-icon-button
+                                matTooltip="{{ 'Save' | translate }}"
+                                (click)="saveChangesModerationNote()"
+                            >
+                                <mat-icon>done</mat-icon>
+                            </button>
+                            <button
+                                mat-icon-button
+                                matTooltip="{{ 'Cancel edit' | translate }}"
+                                (click)="toggleEditModeratorNote()"
+                            >
+                                <mat-icon>close</mat-icon>
+                            </button>
+                        } @else {
+                            <button
+                                mat-icon-button
+                                matTooltip="{{ 'Edit moderation note' | translate }}"
+                                (click)="toggleEditModeratorNote()"
+                            >
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                        }
+                    }
+                    @if (showModerationNotesExport) {
+                        <button
+                            mat-icon-button
+                            matTooltip="{{ 'Export moderator note as PDF' | translate }}"
+                            (click)="onDownloadPDF()"
+                        >
+                            <mat-icon>picture_as_pdf</mat-icon>
+                        </button>
+                    }
+                </div>
+            </div>
+            @if (!isEditing) {
+                <div class="app-content underlined-links detail-view-appearance-container">
+                    @if (moderatorNotes | async; as moderatorNoteText) {
+                        <div [innerHTML]="moderatorNoteText | trust: 'html'"></div>
+                    }
+                </div>
+            }
+            @if (isEditing) {
+                <form [formGroup]="moderatorNoteForm">
+                    <os-editor formControlName="moderator_notes"></os-editor>
+                </form>
+            }
+        </mat-card-content>
+    </mat-card>
+}

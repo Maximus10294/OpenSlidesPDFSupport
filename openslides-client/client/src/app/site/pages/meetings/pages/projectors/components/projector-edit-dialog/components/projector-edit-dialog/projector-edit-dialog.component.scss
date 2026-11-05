@@ -1,0 +1,52 @@
+@use 'src/assets/styles/variables.scss';
+
+form {
+    overflow: hidden;
+}
+
+.settings-grid {
+    display: grid;
+
+    @include variables.desktop {
+        grid-template-columns: 40% 60%;
+    }
+
+    .mat-mdc-form-field {
+        width: 100%;
+    }
+}
+
+.grid-form {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 100px;
+
+    .grid-start {
+        grid-column-start: 1;
+        grid-column-end: 1;
+        margin: auto 0;
+        width: 100%;
+    }
+
+    .grid-end {
+        grid-column-start: 2;
+        grid-column-end: 2;
+        margin: auto 0;
+        margin-left: 4px;
+    }
+}
+
+.no-markup {
+    /* Do not let the a tag ruin the projector */
+    color: inherit;
+    text-decoration: inherit;
+}
+
+.mat-mdc-dialog-actions {
+    display: block;
+}
+
+.preview-container {
+    border: 1px solid lightgray;
+    width: calc(100% - 2px);
+}

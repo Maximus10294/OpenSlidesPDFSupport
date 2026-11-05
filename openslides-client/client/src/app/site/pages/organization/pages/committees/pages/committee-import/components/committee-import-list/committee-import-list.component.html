@@ -1,0 +1,20 @@
+<os-head-bar [nav]="false">
+    <!-- Title -->
+    <div class="title-slot">
+        <h1 class="mock-h2" translate>Import committees</h1>
+    </div>
+
+    <ng-container class="menu-slot">
+        @if (canImport) {
+            <button mat-button (click)="doImport()">
+                <span class="upper">{{ 'Import' | translate }}</span>
+            </button>
+        }
+    </ng-container>
+</os-head-bar>
+<os-backend-import-list
+    modelName="Committees"
+    [defaultColumns]="columns"
+    [importer]="importer"
+    [possibleFields]="possibleFields"
+/>

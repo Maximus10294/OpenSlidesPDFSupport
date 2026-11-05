@@ -1,0 +1,28 @@
+.orga-settings-form {
+    display: grid;
+    min-width: 100px;
+    max-width: 100%;
+    margin: auto;
+}
+
+.superadmin-place,
+.saml-settings-form {
+    section {
+        mat-form-field {
+            display: block;
+            margin: 6px 0;
+        }
+    }
+}
+
+mat-card mat-card-content h2 {
+    margin-top: 0 !important;
+}
+
+.checkbox-hint {
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    font-size: 12px;
+}

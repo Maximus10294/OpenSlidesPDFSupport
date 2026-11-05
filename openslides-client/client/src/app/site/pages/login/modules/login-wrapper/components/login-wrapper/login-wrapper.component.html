@@ -1,0 +1,25 @@
+<div class="main-login-wrapper background-default">
+    <div class="content-wrapper">
+        <mat-toolbar class="login-logo-bar" color="primary">
+            <a routerLink="/login" [queryParams]="{ checkBrowser: false }">
+                <img alt="OpenSlides-logo" src="assets/img/openslides-logo-dark.svg" />
+            </a>
+        </mat-toolbar>
+
+        <div class="main-router">
+            <router-outlet></router-outlet>
+        </div>
+
+        <div class="footer">
+            <a href="https://openslides.com" target="_bank">© Copyright by OpenSlides</a>
+            &middot;
+            <a routerLink="legalnotice">
+                {{ 'Legal notice' | translate }}
+            </a>
+            &middot;
+            <a routerLink="privacypolicy">
+                {{ 'Privacy policy' | translate }}
+            </a>
+        </div>
+    </div>
+</div>

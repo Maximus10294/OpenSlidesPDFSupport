@@ -1,0 +1,61 @@
+<os-view-list
+    [addBottomSpacer]="hasInteractionState | async"
+    [alsoFilterByProperties]="alsoFilterByProperties"
+    [alwaysShowMenu]="alwaysShowMenu"
+    [filterProps]="filterProps"
+    [filterService]="filterService"
+    [hiddenColumns]="hiddenColumns"
+    [listObservable]="listObservable"
+    [listObservableProvider]="listObservableProvider"
+    [multiSelect]="multiSelect"
+    [searchFieldInput]="searchFieldInput"
+    [searchService]="searchService"
+    [selectedRows]="selectedRows"
+    [showFilterBar]="showFilterBar"
+    [showMenu]="showMenu"
+    [sortService]="sortService"
+    [vScrollFixed]="vScrollFixed"
+    (searchFilterUpdated)="searchFilterUpdated.emit($event)"
+    (selectedRowsChange)="selectedRowsChange.emit($event)"
+>
+    <!-- Projector column -->
+    <div
+        *osScrollingTableCell="
+            'projector';
+            row as viewModel;
+            config: { width: projectorButtonColumnWidth, position: START_POSITION }
+        "
+        class="fill ngrid-lg"
+    >
+        <os-projector-button
+            *osPerms="permission.projectorCanManage"
+            class="projector-button"
+            [object]="viewModel"
+            (changeEvent)="viewUpdateEvent()"
+        ></os-projector-button>
+        <!-- Projector indicator -->
+        <div *osPerms="permission.projectorCanManage; complement: true" class="projector-button">
+            @if (isProjectedFn(viewModel)) {
+                <mat-icon color="accent" matTooltip="{{ 'Currently projected' | translate }}">videocam</mat-icon>
+            }
+        </div>
+    </div>
+
+    @if (permission.projectorCanSee) {
+        <!-- Speaker -->
+        <div
+            *osScrollingTableCell="
+                'speaker';
+                row as viewModel;
+                rowContext as rowContext;
+                config: { width: 60, position: END_POSITION }
+            "
+            class="fill"
+        >
+            <os-speaker-button
+                [disabled]="multiSelect"
+                [object]="_getSpeakerButtonObject(viewModel)"
+            ></os-speaker-button>
+        </div>
+    }
+</os-view-list>

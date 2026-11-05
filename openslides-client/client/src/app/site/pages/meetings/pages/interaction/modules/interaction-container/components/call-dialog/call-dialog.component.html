@@ -1,0 +1,56 @@
+<!-- iFrame Dialog -->
+<div class="jitsi-fake-dialog-wrapper" [ngClass]="{ 'dialog-mobile': (isMobile | async) }">
+    <mat-card>
+        <mat-card-content>
+            <div class="action-title">
+                <span>
+                    <a
+                        *osPerms="permission.listOfSpeakersCanManage"
+                        color="primary"
+                        mat-icon-button
+                        matTooltip="{{ 'Open Jitsi in new tab' | translate }}"
+                        target="_blank"
+                        type="button"
+                        [href]="jitsiMeetUrl | async"
+                        (click)="hangUp()"
+                    >
+                        <mat-icon>open_in_new</mat-icon>
+                    </a>
+                </span>
+                <span class="right">
+                    <button
+                        color="primary"
+                        mat-icon-button
+                        matTooltip="{{ 'Minimize' | translate }}"
+                        type="button"
+                        (click)="hideDialog()"
+                    >
+                        <mat-icon>minimize</mat-icon>
+                    </button>
+
+                    <!-- does not exist yet -->
+                    <!-- <button
+                        mat-icon-button
+                        type="button"
+                        color="primary"
+                        matTooltip="{{ 'Full screen' | translate }}"
+                        (click)="fullScreen()()"
+                    >
+                        <mat-icon>fullscreen</mat-icon>
+                    </button> -->
+
+                    <button
+                        color="primary"
+                        mat-icon-button
+                        matTooltip="{{ 'Exit conference room' | translate }}"
+                        type="button"
+                        (click)="hangUp()"
+                    >
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </span>
+            </div>
+            <div #jitsi class="jitsi-iframe-wrapper"></div>
+        </mat-card-content>
+    </mat-card>
+</div>

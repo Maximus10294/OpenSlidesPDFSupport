@@ -32,17 +32,19 @@ docker/secrets/*.env
 Compodoc
 __pycache__
 bower_components
-client
+/client
 make
 openslides_*
 openslides
 personal_data
-tests
+/tests
 .launch/
 .venv/
 .virtualenv/
 .vscode/
-client/package-lock.json
+/client/package-lock.json
 server/
+
+
 # OS3+-Submodules
 /autoupdate/

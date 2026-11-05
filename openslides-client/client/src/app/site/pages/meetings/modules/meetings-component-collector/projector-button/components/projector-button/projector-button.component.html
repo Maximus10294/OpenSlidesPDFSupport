@@ -1,0 +1,29 @@
+<ng-container *osPerms="permission.projectorCanManage">
+    @if (menuItem) {
+        <button mat-menu-item [disabled]="disabled" (click)="onClick()">
+            <mat-icon>videocam</mat-icon>
+            <span #ref><ng-content></ng-content></span>
+            @if (!ref.innerHTML.trim()) {
+                @if (isSingleProjection) {
+                    {{ `Project` | translate }}
+                } @else {
+                    {{ `Add to queue` | translate }}
+                }
+            }
+        </button>
+    } @else if (!blendIn) {
+        <button mat-mini-fab [color]="isProjected ? 'accent' : 'basic'" [disabled]="disabled" (click)="onClick($event)">
+            <mat-icon>videocam</mat-icon>
+        </button>
+    } @else {
+        <button
+            class="blend-in"
+            mat-icon-button
+            [color]="isProjected ? 'accent' : 'basic'"
+            [disabled]="disabled"
+            (click)="onClick($event)"
+        >
+            <mat-icon>videocam</mat-icon>
+        </button>
+    }
+</ng-container>

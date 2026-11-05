@@ -1,0 +1,45 @@
+.head-button {
+    position: fixed !important;
+    z-index: 10; // should always be in top of everything else
+    right: 20px;
+    bottom: 55px;
+}
+
+.sticky-toolbar {
+    top: 0;
+    z-index: 1000;
+    position: sticky;
+    height: var(--view-headbar-height) !important;
+
+    .toolbar-left {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+        .toolbar-left-text {
+            margin-left: 10px;
+            width: 100%;
+            overflow: hidden;
+
+            .title-slot {
+                display: block;
+                h2 {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+            }
+        }
+    }
+
+    .toolbar-right {
+        display: flex;
+        align-items: center;
+        .extra-controls-slot {
+            display: flex;
+        }
+    }
+}
+
+mat-toolbar.multi-select {
+    background-color: #757575 !important;
+}

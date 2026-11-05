@@ -1,0 +1,29 @@
+<div class="single-orga-statistic">
+    <ng-container
+        [ngTemplateOutlet]="singleStatistik"
+        [ngTemplateOutletContext]="{
+            label: activeMeetingsText,
+            current: activeMeetings,
+            max: maxMeetingsObservable | async
+        }"
+    ></ng-container>
+</div>
+
+<div class="single-orga-statistic">
+    <ng-container
+        [ngTemplateOutlet]="singleStatistik"
+        [ngTemplateOutletContext]="{ label: activeUsersText, current: activeUsers, max: maxUserObservable | async }"
+    ></ng-container>
+</div>
+
+<ng-template #singleStatistik let-current="current" let-label="label" let-max="max">
+    @if (max) {
+        <div>{{ label | translate }}: {{ current }}/{{ max }}</div>
+    }
+    @if (!max) {
+        <div>{{ label | translate }}: {{ current }}</div>
+    }
+    @if (max) {
+        <mat-progress-bar mode="determinate" [value]="(current / max) * 100" />
+    }
+</ng-template>

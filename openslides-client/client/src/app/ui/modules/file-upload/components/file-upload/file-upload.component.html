@@ -1,0 +1,53 @@
+<div class="upload-area">
+    <div class="upload-area--top-content">
+        <input #fileInput hidden multiple type="file" (change)="onSelectFile($event)" />
+
+        <div class="selection-area">
+            <ngx-file-drop
+                contentClassName="file-drop-content-style"
+                dropZoneClassName="file-drop-zone-style"
+                dropZoneLabel="{{ 'Drop files into this area OR click here to select files' | translate }}"
+                (click)="fileInput.click()"
+                (onFileDrop)="onDropFile($event)"
+            ></ngx-file-drop>
+        </div>
+
+        <!-- Additional content -->
+        <ng-container *ngTemplateOutlet="additionalContent"></ng-container>
+    </div>
+    <div class="upload-area--bottom-content" [hidden]="isEmpty">
+        <ng-container *ngTemplateOutlet="tableTemplate"></ng-container>
+    </div>
+</div>
+
+<!-- Upload and clear buttons -->
+<div class="action-buttons">
+    <button color="accent" mat-raised-button type="button" [disabled]="isUploadDisabled" (click)="onUploadButton()">
+        <span>{{ 'Upload' | translate }}</span>
+    </button>
+    <button mat-raised-button type="button" [disabled]="isUploadDisabled" (click)="onClearButton()">
+        <span>{{ 'Clear list' | translate }}</span>
+    </button>
+</div>
+
+@if (showProgress) {
+    <mat-card class="os-card">
+        <mat-card-content>
+            @if (!parallel) {
+                <mat-progress-bar mode="determinate" [value]="progressObservable | async" />
+            } @else {
+                <mat-progress-bar mode="buffer" />
+            }
+        </mat-card-content>
+    </mat-card>
+}
+
+<ng-template #tableTemplate>
+    <os-scrolling-table vScrollFixed="50" [dataSource]="dataSource" [showHeader]="true" [tableHeight]="tableHeight">
+        <div *osScrollingTableCell="'remove'; row as file; config: { width: 24 }">
+            <button mat-icon-button matTooltip="{{ 'Remove file' | translate }}" (click)="onRemoveButton(file)">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </os-scrolling-table>
+</ng-template>

@@ -1,0 +1,52 @@
+@use 'src/assets/styles/poll-colors.scss';
+
+.yes {
+    color: poll-colors.$votes-yes-color;
+}
+
+.no {
+    color: poll-colors.$votes-no-color;
+}
+
+.abstain {
+    color: poll-colors.$votes-abstain-color;
+}
+
+.bg-yes {
+    background-color: poll-colors.$votes-yes-color;
+}
+
+.bg-no {
+    background-color: poll-colors.$votes-no-color;
+}
+
+.bg-abstain {
+    background-color: poll-colors.$votes-abstain-color;
+}
+
+.voted-yes {
+    color: poll-colors.$votes-yes-color;
+    opacity: 1 !important;
+}
+
+.voted-no {
+    color: poll-colors.$votes-no-color;
+    opacity: 1 !important;
+}
+
+.voted-abstain {
+    color: poll-colors.$votes-abstain-color;
+    opacity: 1 !important;
+}
+
+.start-poll-button {
+    color: poll-colors.$poll-start-color;
+}
+
+.stop-poll-button {
+    color: poll-colors.$poll-stop-color;
+}
+
+.publish-poll-button {
+    color: poll-colors.$poll-publish-color;
+}

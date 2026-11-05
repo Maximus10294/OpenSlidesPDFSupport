@@ -1,0 +1,23 @@
+@for (item of shortenedList; track item; let isLast = $last) {
+    <span>
+        @if (templateRef) {
+            <span>
+                <ng-template
+                    [ngTemplateOutlet]="templateRef"
+                    [ngTemplateOutletContext]="{ $implicit: item }"
+                ></ng-template>
+            </span>
+        } @else {
+            <span [innerHtml]="item"></span>
+        }
+        @if (!isLast) {
+            @if (!useMidpoint) {
+                <span>,&#32;</span>
+            } @else {
+                <span>&ensp;&middot;&ensp;</span>
+            }
+        } @else if (ellipsed) {
+            <span>…</span>
+        }
+    </span>
+}

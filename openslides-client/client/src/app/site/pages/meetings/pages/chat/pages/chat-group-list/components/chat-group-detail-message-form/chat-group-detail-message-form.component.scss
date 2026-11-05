@@ -1,0 +1,8 @@
+.chat-form-field {
+    .chat-form-field-prefix {
+        position: absolute;
+        z-index: 1000;
+        transform: translate(-2px, -64px) scale(0.75);
+        width: 40px;
+    }
+}

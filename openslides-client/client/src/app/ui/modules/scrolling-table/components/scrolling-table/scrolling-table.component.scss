@@ -1,0 +1,99 @@
+@mixin scrolling-table-style() {
+    box-sizing: border-box;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.025);
+    }
+
+    .scrolling-table-cell {
+        position: relative;
+        flex: 1;
+        padding-left: 12px;
+        padding-right: 6px;
+        box-sizing: content-box;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        overflow-y: auto;
+
+        &:not(:first-child) {
+            border-left: 1px solid rgba(0, 0, 0, 0);
+        }
+
+        &.selection-cell {
+            max-width: 40px;
+            min-width: 40px;
+        }
+
+        &:first-child {
+            padding-left: 24px;
+        }
+        &:last-child {
+            padding-right: 24px;
+        }
+    }
+}
+
+:host,
+.scrolling-table-container {
+    display: block;
+    height: inherit;
+    user-select: none;
+}
+
+.scrolling-table-header {
+    @include scrolling-table-style();
+
+    .scrolling-table-cell {
+        font-weight: 500;
+    }
+}
+
+.scrolling-table--no-data-wrapper {
+    position: relative;
+    height: 100%;
+}
+
+.virtual-scroll-viewport {
+    height: 100%;
+
+    .scrolling-table-row {
+        overflow: hidden;
+        @include scrolling-table-style();
+    }
+}
+
+.scrolling-table-cell ::ng-deep {
+    .fill {
+        position: relative;
+        display: inherit;
+        height: 100%;
+        width: 100%;
+
+        // try to put all children in the in the vertical middle
+        * {
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+    }
+
+    .checkbox-ripple-padding {
+        padding-left: 12px;
+    }
+
+    .central-button {
+        justify-content: center;
+    }
+
+    .clickable {
+        cursor: pointer;
+    }
+
+    .detail-link {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+}

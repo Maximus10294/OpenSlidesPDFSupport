@@ -1,0 +1,23 @@
+@use 'src/assets/styles/poll-colors.scss';
+
+.centered-button-wrapper {
+    display: flex;
+    text-align: center;
+    > * {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .vote-submitted {
+        color: poll-colors.$votes-yes-color;
+        font-size: 200%;
+        overflow: visible;
+    }
+}
+
+.submit-vote-indicator {
+    text-align: center;
+    .mat-spinner {
+        margin: auto;
+    }
+}

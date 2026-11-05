@@ -1,0 +1,33 @@
+<!-- Template for new motion block dialog -->
+<h1 mat-dialog-title>{{ 'New motion block' | translate }}</h1>
+<form tabindex="-1" [formGroup]="createBlockForm">
+    <mat-dialog-content>
+        <!-- Title -->
+        <mat-form-field>
+            <mat-label>{{ 'Title' | translate }}</mat-label>
+            <input formControlName="title" matInput required />
+            @if (createBlockForm.get('title')!.hasError('required')) {
+                <mat-error>
+                    {{ 'A title is required' | translate }}
+                </mat-error>
+            }
+        </mat-form-field>
+
+        <!-- Internal -->
+        <p>
+            <mat-checkbox formControlName="internal">
+                <span>{{ 'Internal' | translate }}</span>
+            </mat-checkbox>
+        </p>
+
+        <os-agenda-content-object-form [form]="createBlockForm"></os-agenda-content-object-form>
+    </mat-dialog-content>
+</form>
+<mat-dialog-actions>
+    <button mat-button [disabled]="!createBlockForm.valid" (click)="saveBlock()">
+        <span>{{ 'Save' | translate }}</span>
+    </button>
+    <button mat-button [mat-dialog-close]="null">
+        <span>{{ 'Cancel' | translate }}</span>
+    </button>
+</mat-dialog-actions>

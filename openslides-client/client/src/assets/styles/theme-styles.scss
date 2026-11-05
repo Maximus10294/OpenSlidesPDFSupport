@@ -1,0 +1,76 @@
+/** Imports the material-design-theming */
+@use '@angular/material' as mat;
+
+@use 'themes/default-light.scss' as light;
+@use 'themes/default-dark.scss' as dark;
+
+/** Global component style definition */
+@use 'global-components-style.scss';
+@use 'themes/var-overwrites.scss';
+
+@include mat.elevation-classes();
+@include mat.app-background();
+
+@include mat.all-component-themes(light.$openslides-light-theme);
+
+.openslides-light-theme {
+    @include global-components-style.os-component-themes(light.$openslides-light-theme);
+    @include var-overwrites.os-var-overwrites();
+
+    --mat-menu-item-icon-color: rgba(0, 0, 0, 0.54);
+    --mat-table-header-headline-color: rgba(0, 0, 0, 0.55);
+    --mat-chip-option-background-color: lightgrey;
+}
+
+.openslides-dark-theme {
+    @include mat.all-component-colors(dark.$openslides-dark-theme);
+    @include global-components-style.os-component-themes(dark.$openslides-dark-theme);
+    @include var-overwrites.os-var-overwrites();
+
+    --mat-table-header-headline-color: rgba(255, 255, 255, 0.7);
+    --mat-chip-option-background-color: grey;
+
+    mat-form-field:focus-within {
+        mat-label {
+            color: white;
+        }
+    }
+}
+
+.mat-calendar-body-cell {
+    --mat-datepicker-calendar-date-in-range-state-background-color: var(--theme-primary-500);
+}
+
+[class^='openslides-'][class*='-light-theme'] {
+    .logo-container {
+        img.dark {
+            display: none;
+        }
+        img.default {
+            display: inherit;
+        }
+    }
+
+    .grey-icon {
+        color: #707070;
+    }
+}
+
+/**
+* Custom configuration for dark themes
+*/
+[class^='openslides-'][class*='-dark-theme'] {
+    color: white;
+    .logo-container {
+        img.dark {
+            display: inherit;
+        }
+        img.default {
+            display: none;
+        }
+    }
+
+    .grey-icon {
+        color: white;
+    }
+}
